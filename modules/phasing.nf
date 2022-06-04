@@ -1,74 +1,43 @@
-#!/usr/bin/env nextflow
-
-nextflow.enable.dsl = 2
-
-workflow {
-
-    chromosome = getChromosomes()
-    geneticMap = getGeneticMapFiles()
-    //[chrom, thousandGenomesReference, kgp_index] = getThousandGenomesReference()
-    thousandGenomesReference = getThousandGenomesReference().view()
-
-
-    vcf = getVcf()
-
-    chromosome
-        .combine(vcf)
-        .set { splitvcf_input }
-    
-    perChromosomeVcfFiles = splitVcfByChrom( splitvcf_input )   
-    perChromosomeVcfFiles
-	.map { chrom, vcfFile -> tuple( "${chrom}", vcfFile ) }
-	.join( thousandGenomesReference )
-	.join( geneticMap )
-	.set { checkstrand_input }
-
-    alignedVcfs = alignGenotypesToReference( checkstrand_input )
-    alignedVcfs
-        .map { chrom, vcfFile, logFile -> tuple( "${chrom}", vcfFile, logFile ) }
-        .join( thousandGenomesReference )
-        .join( geneticMap )
-        .set { phasing_input }
-
-/*
-    phasedVcfFiles = phaseGenotypes( phasing_input )
-    getVcfIndex(phasedVcfFiles).view()
-
-    prePhasingQualityReports = getCheckStrandReports()
-*/
-	
-}
-
 def getVcf() {
-    return channel.fromPath( params.inputDir + params.vcf )
+    return channel.fromPath( params.vcf_dir + params.vcf )
 }
 
 def getChromosomes() {
     return channel.of(1..22, 'X')
 }
 
-def getThousandGenomesReference() {
-    return channel.fromFilePairs( params.referenceDir + "chr*1kg.phase3.v5a.vcf.{gz,gz.tbi}", size: 2 )
+def getReferencePanel() {
+    return channel.fromFilePairs( params.panel_dir + "chr*1kg.phase3.v5a.vcf.{gz,gz.tbi}", size: 2 )
                   .ifEmpty { error "\nAn error occurred! Please check that the reference file and its index '.tbi' exist...\n" }
 	   	  .map { chr, ref_file -> 
 			 tuple( chr.replaceFirst(/chr/,""), ref_file.first(), ref_file.last())
 	    	  }
 }
 
-/*
-def getThousandGenomesReference() {
-    return channel.fromFilePairs( params.referenceDir + 'chr*1kg.phase3.v5a.vcf.gz', size: 1 )
-	   	  .map { group_key, ref_file -> 
-			 tuple( group_key.replaceFirst(/chr/,""), ref_file.first())
-	    	  }
+def getCostumReferencePanel() {
+    return channel.fromFilePairs( params.panel_dir + "wgs_chr*_phased.vcf.{gz,gz.tbi}", size: 2 )
+                  .ifEmpty { error "\nAn error occurred! Please check that the reference file and its index '.tbi' exist...\n" }
+                  .map { chr, ref_file ->
+                         tuple( chr.replaceFirst(/wgs_chr/,""), ref_file.first(), ref_file.last() )
+                  }
 }
-*/
 
-def getGeneticMapFiles() {
-    return channel.fromFilePairs( params.referenceDir + 'plink.chr*.GRCh37.map', size: 1 )
-		  .map { group_key, map_file ->
-			 tuple( group_key.replaceFirst(/^plink\.chr/,""), map_file.first() )
-		  }
+def getEagleHapmapGeneticMap() {
+    return channel.fromPath( params.panel_dir + "/tables/genetic_map_hg19_withX.txt.gz" )
+}
+
+def getHapmapGeneticMap() {
+    return channel.fromFilePairs( params.panel_dir + "genetic_map_chr*_combined_b37.txt", size: 1 )
+                  .map { chr, map_file ->
+                         tuple( chr.replaceFirst(/genetic_map_chr/,""), map_file.first() )
+                  }
+}
+
+def getPlinkGeneticMap() {
+    return channel.fromFilePairs( params.panel_dir + 'plink.chr*.GRCh37.map', size: 1 )
+                  .map { chr, map_file ->
+                         tuple( chr.replaceFirst(/^plink\.chr/,""), map_file.first() )
+                  }
 }
 
 /*
@@ -92,10 +61,13 @@ process getVcfIndex() {
     label 'mediumMemory'
     input:
         tuple \
-            val(chrom), \
-            path(input_vcf)
+        val(chrom), \
+        path(input_vcf)
     output:
-        path "*.tbi"
+        tuple \
+            val(chrom), \
+            path("${input_vcf}"), \
+            path("${input_vcf}.tbi")
     script:
         """
         bcftools \
@@ -112,17 +84,18 @@ process splitVcfByChrom() {
     label 'splitVCF'
     cache 'lenient'
     input:
-        tuple val(chrom), path(input_vcf)
+        tuple \
+            val(chrom), \
+            path(input_vcf)
     output:
-        publishDir path: "${params.outputDir}"
-        tuple val(chrom), path("chr${chrom}.vcf.gz")
+        tuple \
+            val(chrom), \
+            path("chr${chrom}.vcf.gz")
     script:
         """
         plink2 \
             --vcf ${input_vcf} \
             --chr ${chrom} \
-            --maf 0.01 \
-            --max-alleles 2 \
             --vcf-half-call missing \
             --export vcf-4.2 bgz id-paste='iid' \
             --threads ${task.cpus} \
@@ -137,7 +110,7 @@ process alignGenotypesToReference() {
     input:
 	tuple val(chrom), path(input_vcf), path(ref_vcf), path(ref_index), path(geneticMap)
     output:
-	publishDir path: "${params.outputDir}", mode: 'copy'
+	publishDir path: "${params.out_dir}", mode: 'copy'
         tuple val("${chrom}"), path("chr${chrom}-aligned.vcf.gz"), path("chr${chrom}-aligned.log")
     script:
 	"""
@@ -151,19 +124,24 @@ process alignGenotypesToReference() {
 	"""
 }
 
-process phaseGenotypes() {
+process beaglephase() {
     tag "processing chr${chrom}"
     label 'beagle'
     label 'phaseGenotypes'
     input:
-	tuple val(chrom), path(input_vcf), path(vcf_log), path(ref_vcf), path(ref_index), path(geneticMap)
+	tuple val(chrom), path(input_vcf), path(vcf_index), path(ref_vcf), path(ref_index), path(geneticMap)
     output:
-	publishDir path: "${params.outputDir}", mode: 'copy'
+	publishDir path: "${params.out_dir}", mode: 'copy'
 	tuple \
             val(chrom), \
-            path("chr${chrom}-phased.vcf.gz")
+            path("chr${chrom}.*.vcf.gz")
     script:
 	"""
+        if [[ ${params.impute} == "true" ]]; then
+           out_suffix=imputed;
+        else
+           out_suffix=phased
+        fi
 	beagle \
 	    gt="${input_vcf}" \
 	    ref="${ref_vcf}" \
@@ -174,8 +152,134 @@ process phaseGenotypes() {
 	    ne=20000 \
 	    impute=${params.impute} \
 	    nthreads=${task.cpus} \
-	    out="chr${chrom}-phased"
+	    out="chr${chrom}.\${out_suffix}"
 	"""
+}
+
+process eaglePhaseWithoutRef() {
+    tag "processing chr${chrom}"
+    label 'eagle'
+    label 'phaseGenotypes'
+    cache 'lenient'
+    input:
+        tuple \
+            val(chrom), \
+            path(input_vcf), \
+            path(vcf_index), \
+            path(geneticMap)
+    output:
+        publishDir path: "${params.out_dir}", mode: 'copy'
+        tuple \
+            val(chrom), \
+            path("${params.out_prefix}_chr${chrom}_phased.vcf.gz"), \
+            path(vcf_index)
+    script:
+        """
+        eagle \
+          --vcf=${input_vcf} \
+          --geneticMapFile=${geneticMap} \
+          --chrom=${chrom} \
+          --numThreads=${task.cpus} \
+          --Kpbwt=${params.kpbwt} \
+          --vcfOutFormat=z \
+          --outPrefix=${params.out_prefix}_chr${chrom}_phased 2>&1 | \
+          tee ${params.out_prefix}_chr${chrom}_phased.log
+        """
+}
+
+process createLegendFile() {
+    tag "processing chr${chrom}"
+    label 'vcftools'
+    label 'mediumMemory'
+    cache 'lenient'
+    input:
+        tuple \
+            val(chrom), \
+            path(input_vcf), \
+            path(vcf_index)
+    output:
+        publishDir path: "${params.out_dir}", mode: 'copy'
+        tuple \
+            val(chrom), \
+            path(input_vcf), \
+            path("${input_vcf.simpleName}.legend.gz")
+    script:
+        """
+        echo "id position a0 a1 all.aaf" > header
+        vcftools \
+            --gzvcf ${input_vcf} \
+            --freq \
+            --out ${chrom}
+        sed 's/:/\\t/g' ${chrom}.frq | \
+            sed 1d | \
+            awk '{print \$1":"\$2" "\$2" "\$5" "\$7" "\$8}' \
+            > ${input_vcf.simpleName}.legend
+        cat header ${input_vcf.simpleName}.legend | \
+            bgzip \
+            > ${input_vcf.simpleName}.legend.gz
+        """
+}
+
+process prepareChrXPanel() {
+    tag "processing chr${chrom}"
+    label 'eagle'
+    label 'phaseGenotypes'
+    input:
+        tuple \
+            val(chrom), \
+            path(input_vcf)
+    output:
+        publishDir path: "${params.out_dir}", mode: 'copy'
+        tuple \
+            val(chrom), \
+            path("${input_vcf.simpleName}_PAR1.vcf.gz"), \
+            path("${input_vcf.simpleName}_PAR1,nonPAR.vcf.gz.tbi"), \
+            path("${input_vcf.simpleName}_PAR2.vcf.gz"), \
+            path("${input_vcf.simpleName}_PAR2,nonPAR.vcf.gz.tbi"), \
+            path("${input_vcf.simpleName}_nonPAR.vcf.gz"), \
+            path("${input_vcf.simpleName}_nonPAR.vcf.gz.tbi")
+    script:
+        """
+        bcftools \
+            index \
+            -ft \
+            --threads \
+            ${task.cpus} \
+            ${input_vcf}
+        bcftools \
+            view \
+            -r X:60001-2699520 \
+            ${input_vcf} \
+            -Oz | \
+            tee ${input_vcf.simpleName}_PAR1.vcf.gz | \
+            bcftools \
+                index \
+                -ft \
+                --threads ${task.cpus} \
+                --output ${input_vcf.simpleName}_PAR1.vcf.gz.tbi
+        bcftools \
+            view \
+            -r X:154931044-155260560 \
+            ${input_vcf} \
+            -Oz | \
+            tee ${input_vcf.simpleName}_PAR2.vcf.gz | \
+            bcftools \
+                index \
+                -ft \
+                --threads ${task.cpus} \
+                --output ${input_vcf.simpleName}_PAR2.vcf.gz.tbi
+        bcftools \
+            view \
+            -r X:2699521-154931043 \
+            ${input_vcf} \
+            -Oz | \
+            tee ${input_vcf.simpleName}_nonPAR.vcf.gz | \
+            bcftools \
+                index \
+                -ft \
+                --threads ${task.cpus} \
+                --output ${input_vcf.simpleName}_nonPAR.vcf.gz.tbi            
+        """
 }
 
 process getVcfIntersect() {

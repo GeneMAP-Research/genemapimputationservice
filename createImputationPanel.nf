@@ -14,24 +14,21 @@ include {
     eaglePhaseWithoutRef;
     getEagleHapmapGeneticMap;
     getVcfIndex;
-    getCostumReferencePanel;
+    createLegendFile;
 } from "${projectDir}/modules/phasing.nf"
 
 workflow {
-
     chromosome = getChromosomes()
     vcf = getVcf()
     chromosome.combine(vcf).set { split_vcf_input }
     per_chr_vcf = splitVcfByChrom(split_vcf_input)
     vcf_fileset = getVcfIndex(per_chr_vcf)
-    geneticMap = getPlinkGeneticMap()
-    refPanel = getCostumReferencePanel()
-    vcf_fileset.map { chr, vcf, index -> tuple("${chr}", vcf, index) }.set { vcfFileset }
-    refPanel.map { chr, vcf, index -> tuple("${chr}", vcf, index) }.set { ref_panel }
-    vcfFileset.join(ref_panel).set { phase_input }
-    phase_input.join(geneticMap).set { impute_input }
 
-   beaglephase(impute_input)
+    hapmapGeneticMap = getEagleHapmapGeneticMap()
+    vcf_fileset.combine(hapmapGeneticMap).set { eagle_no_ref_phase_input }
+    phased_vcf = eaglePhaseWithoutRef(eagle_no_ref_phase_input)
+    createLegendFile(phased_vcf).view()
+
 /*
     thousandGenomesReference = getThousandGenomesReference().view()
 
