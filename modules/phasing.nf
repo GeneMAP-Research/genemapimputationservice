@@ -6,7 +6,7 @@ def getChromosomes() {
     return channel.of(1..22, 'X')
 }
 
-def getReferencePanel() {
+def getThousandGenomesReference() {
     return channel.fromFilePairs( params.panel_dir + "chr*1kg.phase3.v5a.vcf.{gz,gz.tbi}", size: 2 )
                   .ifEmpty { error "\nAn error occurred! Please check that the reference file and its index '.tbi' exist...\n" }
 	   	  .map { chr, ref_file -> 
@@ -24,6 +24,11 @@ def getCostumReferencePanel() {
 
 def getEagleHapmapGeneticMap() {
     return channel.fromPath( params.panel_dir + "/tables/genetic_map_hg19_withX.txt.gz" )
+}
+
+def getShapeitGeneticMap() {
+    return channel.fromPath( params.panel_dir + "/shapeit/chr*.b37.gmap.gz" )
+                  .map { map -> tuple(map.simpleName.replaceAll(/chr/,""), map) }
 }
 
 def getHapmapGeneticMap() {
@@ -171,8 +176,7 @@ process eaglePhaseWithoutRef() {
         publishDir path: "${params.out_dir}", mode: 'copy'
         tuple \
             val(chrom), \
-            path("${params.out_prefix}_chr${chrom}_phased.vcf.gz"), \
-            path(vcf_index)
+            path("${params.out_prefix}_chr${chrom}_phased.vcf.gz")
     script:
         """
         eagle \
@@ -183,6 +187,100 @@ process eaglePhaseWithoutRef() {
           --Kpbwt=${params.kpbwt} \
           --vcfOutFormat=z \
           --outPrefix=${params.out_prefix}_chr${chrom}_phased 2>&1 | \
+          tee ${params.out_prefix}_chr${chrom}_phased.log
+        """
+}
+
+process eaglePhaseWithRef() {
+    tag "processing chr${chrom}"
+    label 'eagle'
+    label 'phaseGenotypes'
+    cache 'lenient'
+    input:
+        tuple \
+            val(chrom), \
+            path(input_vcf), \
+            path(vcf_index), \
+            path(ref_vcf), \
+            path(ref_index), \
+            path(geneticMap)
+    output:
+        publishDir path: "${params.out_dir}", mode: 'copy'
+        tuple \
+            val(chrom), \
+            path("${params.out_prefix}_chr${chrom}_phased.vcf.gz")
+    script:
+        """
+        eagle \
+          --vcfTarget=${input_vcf} \
+          --vcfRef=${ref_vcf} \
+          --geneticMapFile=${geneticMap} \
+          --chrom=${chrom} \
+          --numThreads=${task.cpus} \
+          --Kpbwt=${params.kpbwt} \
+          --vcfOutFormat=z \
+          --outPrefix=${params.out_prefix}_chr${chrom}_phased 2>&1 | \
+          tee ${params.out_prefix}_chr${chrom}_phased.log
+        """
+}
+
+process shapeitPhaseWithoutRef() {
+    tag "processing chr${chrom}"
+    label 'shapeit'
+    label 'phase_shapeit'
+    cache 'lenient'
+    input:
+        tuple \
+            val(chrom), \
+            path(input_vcf), \
+            path(vcf_index), \
+            path(geneticMap)
+    output:
+        publishDir path: "${params.out_dir}", mode: 'copy'
+        tuple \
+            val(chrom), \
+            path("${params.out_prefix}_chr${chrom}_phased_noref.vcf.gz")
+    script:
+        """
+        shapeit4 \
+          --input ${input_vcf} \
+          --map ${geneticMap} \
+          --region ${chrom} \
+          --thread ${task.cpus} \
+          --pbwt-depth ${params.pbwt} \
+          --output ${params.out_prefix}_chr${chrom}_phased_noref 2>&1 | \
+          tee ${params.out_prefix}_chr${chrom}_phased_noref.log
+        """
+}
+
+process shapeitPhaseWithRef() {
+    tag "processing chr${chrom}"
+    label 'shapeit'
+    label 'phase_shapeit'
+    cache 'lenient'
+    input:
+        tuple \
+            val(chrom), \
+            path(input_vcf), \
+            path(vcf_index), \
+            path(ref_vcf), \
+            path(ref_index), \
+            path(geneticMap)
+    output:
+        publishDir path: "${params.out_dir}", mode: 'copy'
+        tuple \
+            val(chrom), \
+            path("${params.out_prefix}_chr${chrom}_phased.vcf.gz")
+    script:
+        """
+        shapeit4 \
+          --input ${input_vcf} \
+          --reference ${ref_vcf} \
+          --map ${geneticMap} \
+          --region ${chrom} \
+          --thread ${task.cpus} \
+          --pbwt-depth ${params.pbwt} \
+          --output ${params.out_prefix}_chr${chrom}_phased 2>&1 | \
           tee ${params.out_prefix}_chr${chrom}_phased.log
         """
 }

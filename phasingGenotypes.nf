@@ -6,36 +6,89 @@ include {
     getChromosomes;
     getHapmapGeneticMap;
     getPlinkGeneticMap;
-    getReferencePanel;
+    getEagleHapmapGeneticMap;
+    getShapeitGeneticMap;
+    getThousandGenomesReference;
     getVcf;
     splitVcfByChrom;
     alignGenotypesToReference;
     beaglephase;
     eaglePhaseWithoutRef;
-    getEagleHapmapGeneticMap;
+    eaglePhaseWithRef;
+    shapeitPhaseWithRef;
+    shapeitPhaseWithoutRef;
     getVcfIndex;
     getCostumReferencePanel;
 } from "${projectDir}/modules/phasing.nf"
 
 workflow {
 
+    if(params.phase == true) {
+       println "\nPHASE MODE ON!\n"
+
+       chromosome = getChromosomes()
+       vcf = getVcf()
+       chromosome.combine(vcf).set { split_vcf_input }
+       per_chr_vcf = splitVcfByChrom(split_vcf_input)
+       vcf_fileset = getVcfIndex(per_chr_vcf)
+       vcf_fileset.map { chr, vcf, index -> tuple("${chr}", vcf, index) }.set { vcfFileset }
+
+       if(params.phase_tool == 'eagle') {
+            if(params.with_ref == true) {
+                geneticmap = getEagleHapmapGeneticMap()
+                refpanel = getThousandGenomesReference()
+                refpanel.combine(geneticmap).set { panel_map }
+                vcfFileset.join(panel_map).set { phase_input }
+                phased = eaglePhaseWithRef(phase_input)
+            } else {
+                geneticmap = getEagleHapmapGeneticMap()
+                vcfFileset.combine(geneticmap).set { phase_input }
+                hased = eaglePhaseWithRef(phase_input)
+            }
+       } else if(params.phase_tool == 'shapeit') {
+            if(params.with_ref == true) {
+                geneticmap = getShapeitGeneticMap()
+                refpanel = getThousandGenomesReference()
+                refpanel.join(geneticmap).set { panel_map }
+                vcfFileset.join(panel_map).set { phase_input }
+                phased = shapeitPhaseWithRef(phase_input).view()
+            } else {
+                geneticmap = getShapeitGeneticMap()
+                vcfFileset.join(geneticmap).set { phase_input }
+                phased = shapeitPhaseWithoutRef(phase_input).view()
+          }
+       } else if(params.phase_tool == 'beagle') {
+          geneticmap = getPlinkGeneticMap()
+       }
+
+    } else if(params.impute == false) {
+       error: println "\nWORKFLOW STOPPED: Please select a run mode - 'phase' and/or 'impute' -\n"
+    } 
+
+
+
+/*
     chromosome = getChromosomes()
+
     vcf = getVcf()
     chromosome.combine(vcf).set { split_vcf_input }
     per_chr_vcf = splitVcfByChrom(split_vcf_input)
     vcf_fileset = getVcfIndex(per_chr_vcf)
-    geneticMap = getPlinkGeneticMap()
+    plinkGeneticMap = getPlinkGeneticMap()
+    eagleGeneticMap = getEagleHapmapGeneticMap().view()
+
     refPanel = getCostumReferencePanel()
     vcf_fileset.map { chr, vcf, index -> tuple("${chr}", vcf, index) }.set { vcfFileset }
     refPanel.map { chr, vcf, index -> tuple("${chr}", vcf, index) }.set { ref_panel }
     vcfFileset.join(ref_panel).set { phase_input }
-    phase_input.join(geneticMap).set { impute_input }
+    phase_input.join(plinkGeneticMap).set { impute_input }
 
-   beaglephase(impute_input)
-/*
+    beaglephase(impute_input)
+
+
     thousandGenomesReference = getThousandGenomesReference().view()
 
-    vcf = getVcf()
+    //vcf = getVcf()
 
     chromosome
         .combine(vcf)
@@ -60,5 +113,4 @@ workflow {
 
     prePhasingQualityReports = getCheckStrandReports()
 */
-	
 }
