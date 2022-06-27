@@ -22,19 +22,22 @@ Custom panel creation uses
 
 Uses ```bcftools``` throughtout and ```bgzip``` occasionally
 
-***Requires editting config scripts found in the configs directory before running***
+
+### Requires editting config scripts found in the configs directory before running
 
 The following tutorial will describe clearly how to prepare the workflow and run it on a new cluster
 
 1) Choose a location for all containers that are required: This location is called ```containers_dir``` 
-and it is found in the **containersDir.config** script located in configs directory
+and it is found in the ***containersDir.config*** script located in configs directory
 
-* In my case, my ```containers_dir = '/mnt/lustre/groups/CBBI1243/KEVIN/containers/'``` 
+* In my case ```containers_dir = '/mnt/lustre/groups/CBBI1243/KEVIN/containers/'``` 
 
-Edit this to your preferred location. Note that the total size of all the containers needed can be greater than 10GB
+Edit this to your preferred location. 
+
+> Note that the total size of all the containers needed can be greater than 10GB
 
 2) Now pull the containers using singularity on your cluster as follows:
-* Load singularity on your cluster
+* Load singularity on your cluster: ```module load ...```
 * Navigate to your chosen containers_dir
 * Run the following commands
 ```
