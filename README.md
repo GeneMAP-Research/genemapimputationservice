@@ -23,6 +23,10 @@ Custom panel creation uses
 Uses ```bcftools``` throughtout and ```bgzip``` occasionally
 
 
+## Clone the workflow to your computer or cluster
+git clone 
+
+
 ### Requires editting config scripts found in the configs directory before running
 
 The following tutorial will describe clearly how to prepare the workflow and run it on a new cluster
@@ -35,7 +39,7 @@ and it is found in the ***containersDir.config*** script located in configs dire
 
 Edit this to your preferred location. 
 
-> Note that the total size of all the containers needed can be greater than 10GB
+> Note that the total size of all the containers needed can be upto 5GB
 
 2) Now pull the containers using singularity on your cluster as follows
   * Load singularity on your cluster: ```module load ...```
