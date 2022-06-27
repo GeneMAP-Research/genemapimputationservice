@@ -42,5 +42,11 @@ Edit this to your preferred location.
   * Navigate to your chosen containers_dir
   * Run the following commands
   ```
-
+  singularity pull vcftools_latest.sif docker://biocontainers/vcftools:v0.1.16-1-deb_cv1
+  singularity pull bcftools_latest.sif docker://sickleinafrica/bcftools:1.11
+  singularity pull beagle_latest.sif docker://sickleinafrica/beagle:latest
+  singularity pull eagle2_latest.sif docker://sickleinafrica/eagle2:latest
+  singularity pull plink2_latest.sif docker://sickleinafrica/plink2:latest
+  singularity pull minimac4_latest.sif docker://biocontainers/minimac4:v1.0.0-2-deb_cv1
+  singularity pull minimac3_latest.sif docker://rhughwhite/minimac3:2.0.1
   ```
