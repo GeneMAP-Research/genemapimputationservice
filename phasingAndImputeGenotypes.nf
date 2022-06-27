@@ -19,7 +19,15 @@ include {
     shapeitPhaseWithoutRef;
     getVcfIndex;
     getCostumReferencePanel;
-} from "${projectDir}/modules/phasing.nf"
+    getm3vcf;
+    getMinimacReference;
+    imputeVariantsWithMinimac4;
+} from "${projectDir}/modules/phasing_and_imputation.nf"
+
+include {
+    getPhasedVcf;
+    validateVcf;
+} from "${projectDir}/modules/custom_panel.nf"
 
 workflow {
 
@@ -43,7 +51,7 @@ workflow {
             } else {
                 geneticmap = getEagleHapmapGeneticMap()
                 vcfFileset.combine(geneticmap).set { phase_input }
-                hased = eaglePhaseWithRef(phase_input)
+                phased = eaglePhaseWithoutRef(phase_input)
             }
        } else if(params.phase_tool == 'shapeit') {
             if(params.with_ref == true) {
@@ -61,6 +69,20 @@ workflow {
           geneticmap = getPlinkGeneticMap()
        }
 
+    if(params.impute == true) {
+        println "\nMODE: IMPUTE\n"
+
+    }
+
+    } else if(params.impute == true) {
+        if(params.impute_tool == 'minimac4') {
+            println "\nMODE: IMPUTE ONLY\n"
+            vcf = getPhasedVcf()
+            validateVcf(vcf).map { chr, vcf_file, vcf_index -> tuple(chr.baseName, vcf_file, vcf_index) }.set { vcf_fileset }
+            getMinimacReference().set{ minimac_ref_panel }
+            vcf_fileset.join(minimac_ref_panel).set{ minimac_input }
+            imputeVariantsWithMinimac4(minimac_input).view()
+        }
     } else if(params.impute == false) {
        error: println "\nWORKFLOW STOPPED: Please select a run mode - 'phase' and/or 'impute' -\n"
     } 
