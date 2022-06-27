@@ -32,6 +32,7 @@ The workflow requires editting some config scripts found in the configs director
 The following tutorial will describe clearly how to prepare the workflow and run it on a new cluster
 
 1) Choose a location for all containers that are required
+
 This location is called ```containers_dir``` 
 and it is found in the ***containersDir.config*** script located in configs directory
 
