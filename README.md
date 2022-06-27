@@ -23,7 +23,7 @@ Custom panel creation uses
 Uses ```bcftools``` throughtout and ```bgzip``` occasionally
 
 # Installing and using the workflow
-* Clone the workflow to your computer or cluster
+Clone the workflow to your computer or cluster
 ```
 git clone https://github.com/esohkevin/siaImputationService.git
 ```
