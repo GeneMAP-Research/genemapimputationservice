@@ -27,8 +27,7 @@ Clone the workflow to your computer or cluster.
 ```
 $ git clone https://github.com/esohkevin/siaImputationService.git
 ```
-
-### Requires editting config scripts found in the configs directory before running
+The workflow requires editting some config scripts found in the configs directory before running.
 
 The following tutorial will describe clearly how to prepare the workflow and run it on a new cluster
 
