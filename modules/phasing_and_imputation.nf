@@ -48,7 +48,7 @@ def getHapmapGeneticMap() {
 }
 
 def getPlinkGeneticMap() {
-    return channel.fromFilePairs( params.panel_dir + 'plink.chr*.GRCh37.map', size: 1, checkIfExist: true )
+    return channel.fromFilePairs( params.panel_dir + 'plink.chr*.GRCh37.map', size: 1)
                   .map { chr, map_file ->
                          tuple( chr.replaceFirst(/^plink\.chr/,""), map_file.first() )
                   }
@@ -185,7 +185,7 @@ process eaglePhaseWithoutRef() {
         publishDir path: "${params.out_dir}", mode: 'copy'
         tuple \
             val(chrom), \
-            path("${params.out_prefix}_chr${chrom}_phased.vcf.gz")
+            path("chr${chrom}.${params.out_prefix}.eagle2.noref.vcf.gz")
     script:
         """
         eagle \
@@ -195,8 +195,8 @@ process eaglePhaseWithoutRef() {
           --numThreads=${task.cpus} \
           --Kpbwt=${params.kpbwt} \
           --vcfOutFormat=z \
-          --outPrefix=${params.out_prefix}_chr${chrom}_phased 2>&1 | \
-          tee ${params.out_prefix}_chr${chrom}_phased.log
+          --outPrefix=chr${chrom}.${params.out_prefix}.eagle2.noref 2>&1 | \
+          tee chr${chrom}.${params.out_prefix}.eagle2.noref.log
         """
 }
 
@@ -217,7 +217,7 @@ process eaglePhaseWithRef() {
         publishDir path: "${params.out_dir}", mode: 'copy'
         tuple \
             val(chrom), \
-            path("${params.out_prefix}_chr${chrom}_phased.vcf.gz")
+            path("chr${chrom}.${params.out_prefix}.eagle2.vcf.gz")
     script:
         """
         eagle \
@@ -228,8 +228,8 @@ process eaglePhaseWithRef() {
           --numThreads=${task.cpus} \
           --Kpbwt=${params.kpbwt} \
           --vcfOutFormat=z \
-          --outPrefix=${params.out_prefix}_chr${chrom}_phased 2>&1 | \
-          tee ${params.out_prefix}_chr${chrom}_phased.log
+          --outPrefix=chr${chrom}.${params.out_prefix}.eagle2 2>&1 | \
+          tee chr${chrom}.${params.out_prefix}.eagle2.log
         """
 }
 
@@ -248,7 +248,7 @@ process shapeitPhaseWithoutRef() {
         publishDir path: "${params.out_dir}", mode: 'copy'
         tuple \
             val(chrom), \
-            path("${params.out_prefix}_chr${chrom}_phased_noref.vcf.gz")
+            path("chr${chrom}.${params.out_prefix}.shapeit4.noref.vcf.gz")
     script:
         """
         shapeit4 \
@@ -257,8 +257,8 @@ process shapeitPhaseWithoutRef() {
           --region ${chrom} \
           --thread ${task.cpus} \
           --pbwt-depth ${params.pbwt} \
-          --log ${params.out_prefix}_chr${chrom}_phased_noref.log \
-          --output ${params.out_prefix}_chr${chrom}_phased_noref.vcf.gz
+          --log chr${chrom}.${params.out_prefix}.shapeit4.noref.log \
+          --output chr${chrom}.${params.out_prefix}.shapeit4.noref.vcf.gz
         """
 }
 
@@ -279,7 +279,7 @@ process shapeitPhaseWithRef() {
         publishDir path: "${params.out_dir}", mode: 'copy'
         tuple \
             val(chrom), \
-            path("${params.out_prefix}_chr${chrom}_phased.vcf.gz")
+            path("chr${chrom}.${params.out_prefix}.shapeit4.vcf.gz")
     script:
         """
         shapeit4 \
@@ -289,8 +289,8 @@ process shapeitPhaseWithRef() {
           --region ${chrom} \
           --thread ${task.cpus} \
           --pbwt-depth ${params.pbwt} \
-          --log ${params.out_prefix}_chr${chrom}_phased.log \
-          --output ${params.out_prefix}_chr${chrom}_phased.vcf.gz
+          --log chr${chrom}.${params.out_prefix}.shapeit4.log \
+          --output chr${chrom}.${params.out_prefix}.shapeit4.vcf.gz
         """
 }
 
