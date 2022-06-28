@@ -354,8 +354,8 @@ process createLegendFile() {
 
 process prepareChrXPanel() {
     tag "processing chr${chrom}"
-    label 'eagle'
-    label 'phaseGenotypes'
+    label 'bcftools'
+    label 'mediumMemory'
     input:
         tuple \
             val(chrom), \
