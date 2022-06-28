@@ -41,7 +41,7 @@ workflow {
        vcf_fileset = getVcfIndex(per_chr_vcf)
        vcf_fileset.map { chr, vcf, index -> tuple("${chr}", vcf, index) }.set { vcfFileset }
 
-       if(params.phase_tool == 'eagle') {
+       if(params.phase_tool == 'eagle2') {
             if(params.with_ref == true) {
                 geneticmap = getEagleHapmapGeneticMap()
                 refpanel = getThousandGenomesReference()
@@ -53,7 +53,7 @@ workflow {
                 vcfFileset.combine(geneticmap).set { phase_input }
                 phased = eaglePhaseWithoutRef(phase_input)
             }
-       } else if(params.phase_tool == 'shapeit') {
+       } else if(params.phase_tool == 'shapeit4') {
             if(params.with_ref == true) {
                 geneticmap = getShapeitGeneticMap()
                 refpanel = getThousandGenomesReference()
@@ -65,7 +65,7 @@ workflow {
                 vcfFileset.join(geneticmap).set { phase_input }
                 phased = shapeitPhaseWithoutRef(phase_input).view()
           }
-       } else if(params.phase_tool == 'beagle') {
+       } else if(params.phase_tool == 'beagle5') {
           geneticmap = getPlinkGeneticMap()
        }
 
