@@ -63,11 +63,28 @@ process {
 }
 ``` 
 
-The above two scripts are only edited once to setup the workflow on a new cluster.
+3. > reference-hg*.config
 
-The next script is the job configuration script which will be updated each time a different job is to be run
+There are two config files for reference sequences/panels: reference-hg19.config and reference-hg38.config
 
-3. > nextflow.config 
+The files are located in the configs directory. Edite them accordingly to point the workflow to the appropriate reference sequence/panels location
+
+For instance, for reference-hg19.config
+```
+params {
+    panel_dir = ''			// directory where imputation reference panels are stored or will be stored
+    ref_dir = ''			// directory container fasta reference sequence
+    fastaRef = ''			// name of the fasta reference sequence
+    buildVersion = 'hg19'		// DO NOT EDIT THIS LINE!!!
+}
+
+```
+
+The above three scripts are only edited once to set up the workflow on a new cluster.
+
+The following script is the job configuration script which will be updated each time a different job is to be run
+
+4. > nextflow.config 
 
 Edit the following according to you input paramters.
 ```
@@ -106,6 +123,14 @@ impute = false
 phase_tool = 'shapeit4'
 impute_tool = 'minimac4'
 ```
+Then run workflow as follows
+```
+nextflow run phaseAndImputeGenotypes.nf -w /path/to/work_directory/ -profile pbspro,hg19
+```
+- -w: this is the path where all temporary files will be stored. It should prefarably be a location with enough storage capacity
+- -profile: the profile selector is added to make it easy to run the workflow on any cluster/system and using reference panels in different genome builds. 
+Therefore, if your data set is in GRCh37 coordinate (hg19 or b37), then select hg19, etc.
+
 
 B. PHASING WITHOUT REFERENCE AND THEN IMPUTATION
 The parameters scope should look like this
