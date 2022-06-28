@@ -8,7 +8,7 @@ def getChromosomes() {
 
 def getThousandGenomesReference() {
     return channel.fromFilePairs( params.panel_dir + "chr*1kg.phase3.v5a.vcf.{gz,gz.tbi}", size: 2 )
-                  .ifEmpty { error "\nAn error occurred! Please check that the reference file and its index '.tbi' exist...\n" }
+                  .ifEmpty { error: println "\nAn error occurred! Please check that the reference file and its index '.tbi' exist...\n" }
 	   	  .map { chr, ref_file -> 
 			 tuple( chr.replaceFirst(/chr/,""), ref_file.first(), ref_file.last())
 	    	  }
@@ -16,7 +16,7 @@ def getThousandGenomesReference() {
 
 def getMinimacReference() {
     return channel.fromFilePairs( params.panel_dir + "/m3vcfs/" + "*.{m3vcf.gz,rec,erate}", size: 3 )
-                  .ifEmpty { error "\nAn error occurred! Please check that the reference files exist...\n" }
+                  .ifEmpty { error: println "\nAn error occurred! Please check that the reference files exist...\n" }
                   .map { chr, ref_fileset ->
                          tuple( chr.replaceFirst(/chr/,""), ref_fileset[0], ref_fileset[1], ref_fileset[2])
                   }
@@ -36,6 +36,7 @@ def getEagleHapmapGeneticMap() {
 
 def getShapeitGeneticMap() {
     return channel.fromPath( params.panel_dir + "/shapeit/chr*.b37.gmap.gz" )
+                  .ifEmpty { error: println "\nAn error occurred! Please check that the map files exist...\n" }
                   .map { map -> tuple(map.simpleName.replaceAll(/chr/,""), map) }
 }
 
@@ -47,7 +48,7 @@ def getHapmapGeneticMap() {
 }
 
 def getPlinkGeneticMap() {
-    return channel.fromFilePairs( params.panel_dir + 'plink.chr*.GRCh37.map', size: 1 )
+    return channel.fromFilePairs( params.panel_dir + 'plink.chr*.GRCh37.map', size: 1, checkIfExist: true )
                   .map { chr, map_file ->
                          tuple( chr.replaceFirst(/^plink\.chr/,""), map_file.first() )
                   }
