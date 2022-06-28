@@ -112,7 +112,7 @@ params {
 }
 ```
 
-The following tutorial will describe how to use the nextflow.config file to run jobs
+#### The following tutorial will describe how to use the nextflow.config file to run jobs
 
 --------------------
 A. PHASING WITHOUT REFERENCE (NO IMPUTATION)
