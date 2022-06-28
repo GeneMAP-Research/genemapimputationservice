@@ -27,31 +27,19 @@ Clone the workflow to your computer or cluster.
 ```
 $ git clone https://github.com/esohkevin/siaImputationService.git
 ```
-The workflow requires editting some config scripts found in the configs directory before running.
+---------------------
 
+There are three main configuration scripts that need to be editted before running the workflow
+
+1) **containers.config**: Edit the following line by replacing "${HOME}/singularity" with your own path
+```
+cacheDir = "${HOME}/singularity"
+```
+This allows you to choose a location where the containers that are required will be stored.
+
+It is is best to pick a location with enough storage capacity as the total size of all the
+containers could be upto 5GB
+
+2) ****
 The following tutorial will describe clearly how to prepare the workflow and run it on a new cluster
 
-1) Choose a location for all containers that are required
-
-This location is called ```containers_dir``` 
-and it is found in the ***containersDir.config*** script located in configs directory
-
-  * In my case ```containers_dir = '/mnt/lustre/groups/CBBI1243/KEVIN/containers/'``` 
-
-Edit this to your preferred location. 
-
-> Note that the total size of all the containers needed can be upto 5GB
-
-2) Now pull the containers using singularity on your cluster as follows
-  * Load singularity on your cluster: ```module load ...```
-  * Navigate to your chosen containers_dir
-  * Run the following commands
-  ```
-  $ singularity pull vcftools_latest.sif docker://biocontainers/vcftools:v0.1.16-1-deb_cv1
-  $ singularity pull bcftools_latest.sif docker://sickleinafrica/bcftools:1.11
-  $ singularity pull beagle_latest.sif docker://sickleinafrica/beagle:latest
-  $ singularity pull eagle2_latest.sif docker://sickleinafrica/eagle2:latest
-  $ singularity pull plink2_latest.sif docker://sickleinafrica/plink2:latest
-  $ singularity pull minimac4_latest.sif docker://biocontainers/minimac4:v1.0.0-2-deb_cv1
-  $ singularity pull minimac3_latest.sif docker://rhughwhite/minimac3:2.0.1
-  ```

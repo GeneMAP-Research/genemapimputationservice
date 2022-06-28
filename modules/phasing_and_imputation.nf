@@ -1,5 +1,5 @@
 def getVcf() {
-    return channel.fromPath( params.vcf_dir + params.vcf )
+    return channel.fromPath( params.vcf )
 }
 
 def getChromosomes() {
