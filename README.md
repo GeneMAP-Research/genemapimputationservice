@@ -31,6 +31,9 @@ $ git clone https://github.com/esohkevin/siaImputationService.git
 
 There are three main configuration scripts that need to be editted before running the workflow
 
+> NB: All the scripts are located in the configs directory
+
+
 1) > containers.config
 
 Edit the following line by replacing "${HOME}/singularity" with your own path
@@ -44,7 +47,7 @@ containers could be upto 5GB
 
 2) > pbspro.config
 
-Edit this script to suit your cluster options
+Edit this script to suit your cluster options.
 ```
 executor {
     name = 'pbspro'
