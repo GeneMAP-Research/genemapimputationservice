@@ -31,7 +31,7 @@ $ git clone https://github.com/esohkevin/siaImputationService.git
 
 There are three main configuration scripts that need to be editted before running the workflow
 
-> NB: All the scripts are located in the configs directory
+NB: All the scripts are located in the configs directory
 
 
 1) > containers.config
