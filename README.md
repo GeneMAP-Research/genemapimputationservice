@@ -135,9 +135,9 @@ Therefore, if your data set is in GRCh37 coordinate (hg19 or b37), then select h
 ------------------
 B. IMPUTE GENOTYPES ONLY
 
-This requires pre-phased data in single chromosome VCF files, bgzipped and in a single directory. The directory must also contain the tabix indexed for each VCF file
-The directory of the pre-phased data is supplied using ```input_dir = ''``` in the nextflow.config file
+This requires pre-phased data in single chromosome VCF files, bgzipped and in a single directory. The directory must also contain the tabix indexed for each VCF file.
 
+The directory of the pre-phased data is supplied using ```input_dir``` in the nextflow.config file.
 
 Example
 ```
@@ -151,6 +151,7 @@ chrX.vcf.gz.tbi
 ```
 NB: The directory must only contain the VCF files to be process (and their indexes) and must not contain any other files ending in '.vcf.gz'
 
+---------------------
 C. PHASING WITHOUT REFERENCE AND THEN IMPUTE GENOTYPES
 
 Make the following change in the nextflow.config script ```impute = true``` then run the workflow
