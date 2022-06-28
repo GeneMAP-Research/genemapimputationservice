@@ -72,8 +72,30 @@ The next script is the job configuration script which will be updated each time 
 The following tutorial will describe clearly how to use the nextflow.config file to run jobs
 
 A. PHASING WITHOUT REFERENCE (NO IMPUTATION)
-  - Make the following changes
+  - The parameters scope should look like this
     ```
+    params {
+        phase = true
+        with_ref = false
+        impute = false
+        phase_tool = 'shapeit4'			// options: shapeit4, eagle2, beagle5. [default: shapeit4] 
+        impute_tool = 'minimac4'		// options: minimac4, impute2, beagle5. [default: minimac4]
+    
+        vcf = ''				// insert the VCF file to process here, with the full (absolute) path.
+        out_dir = ''				// full path where the results will be saved
+        out_prefix = ''				// base name of all output files
+    
+        RefereceSamplesToExclude = ''
+    
+        burninIter = 2000                   	// BEAGLE5 (this is only applicable to BEALGE5)
+        mainIter = 1000                     	// BEAGLE5 (this is only applicable to BEALGE5)
+        kpbwt = 20000                       	// BEAGLE5 | EAGLE2 (this is applicable to both EAGLE2 and BEAGLE5)
+        pbwt = 8                            	// SHAPEIT4 (this is only applicable to SHAPEIT4)
+        autosome = false
+    
+        // CREATING IMPUTATION PANEL
+        input_dir = ''                      	// directory containing phased VCF files (single chromosomes) for which imputation panel is to be created
+    }
      
     ```
 
