@@ -51,9 +51,7 @@ executor {
     queueSize = 10                                              // increase or decrease the queue size according to your privileges 
 }
 
-.
-.
-.
+...
 
 process {
     beforeScript = 'module load chpc/singularity/3.5.3'         // load singularity according to your cluster directives
@@ -80,160 +78,29 @@ params {
 
 ```
 
-The panel directory should contain subdirectories with different reference data types. See the example file tree below
+The panel directory should contain subdirectories with different reference data types. See the following folder structure
 ```
 referencePanels
 ├── hapmap
-│   ├── genetic_map_chr10_combined_b37.txt
-│   ├── genetic_map_chr11_combined_b37.txt
-│   ├── genetic_map_chr12_combined_b37.txt
-│   ├── genetic_map_chr13_combined_b37.txt
-│   ├── genetic_map_chr14_combined_b37.txt
-│   ├── genetic_map_chr15_combined_b37.txt
-│   ├── genetic_map_chr16_combined_b37.txt
-│   ├── genetic_map_chr17_combined_b37.txt
-│   ├── genetic_map_chr18_combined_b37.txt
-│   ├── genetic_map_chr19_combined_b37.txt
 │   ├── genetic_map_chr1_combined_b37.txt
-│   ├── genetic_map_chr20_combined_b37.txt
-│   ├── genetic_map_chr21_combined_b37.txt
+│   ├── ...
 │   ├── genetic_map_chr22_combined_b37.txt
-│   ├── genetic_map_chr23_combined_b37.txt
-│   ├── genetic_map_chr24_combined_b37.txt
-│   ├── genetic_map_chr2_combined_b37.txt
-│   ├── genetic_map_chr3_combined_b37.txt
-│   ├── genetic_map_chr4_combined_b37.txt
-│   ├── genetic_map_chr5_combined_b37.txt
-│   ├── genetic_map_chr6_combined_b37.txt
-│   ├── genetic_map_chr7_combined_b37.txt
-│   ├── genetic_map_chr8_combined_b37.txt
-│   ├── genetic_map_chr9_combined_b37.txt
-│   ├── genetic_map_chrX_combined_b37.txt
-│   ├── genetic_map_chrX_nonPAR_combined_b37.txt
-│   ├── genetic_map_chrX_PAR1_combined_b37.txt
-│   └── genetic_map_chrX_PAR2_combined_b37.txt
 ├── kgp
-│   ├── chr10.1kg.phase3.v5a.vcf.gz
-│   ├── chr10.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr11.1kg.phase3.v5a.vcf.gz
-│   ├── chr11.1kg.phase3.v5a.vcf.gz.tbi
 │   ├── chr1.1kg.phase3.v5a.vcf.gz
 │   ├── chr1.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr12.1kg.phase3.v5a.vcf.gz
-│   ├── chr12.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr13.1kg.phase3.v5a.vcf.gz
-│   ├── chr13.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr14.1kg.phase3.v5a.vcf.gz
-│   ├── chr14.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr15.1kg.phase3.v5a.vcf.gz
-│   ├── chr15.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr16.1kg.phase3.v5a.vcf.gz
-│   ├── chr16.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr17.1kg.phase3.v5a.vcf.gz
-│   ├── chr17.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr18.1kg.phase3.v5a.vcf.gz
-│   ├── chr18.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr19.1kg.phase3.v5a.vcf.gz
-│   ├── chr19.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr20.1kg.phase3.v5a.vcf.gz
-│   ├── chr20.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr21.1kg.phase3.v5a.vcf.gz
-│   ├── chr21.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr2.1kg.phase3.v5a.vcf.gz
-│   ├── chr2.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr22.1kg.phase3.v5a.vcf.gz
-│   ├── chr22.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr3.1kg.phase3.v5a.vcf.gz
-│   ├── chr3.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr4.1kg.phase3.v5a.vcf.gz
-│   ├── chr4.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr5.1kg.phase3.v5a.vcf.gz
-│   ├── chr5.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr6.1kg.phase3.v5a.vcf.gz
-│   ├── chr6.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr7.1kg.phase3.v5a.vcf.gz
-│   ├── chr7.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr8.1kg.phase3.v5a.vcf.gz
-│   ├── chr8.1kg.phase3.v5a.vcf.gz.tbi
-│   ├── chr9.1kg.phase3.v5a.vcf.gz
-│   ├── chr9.1kg.phase3.v5a.vcf.gz.tbi
+│   ├── ...
 │   ├── chrX.1kg.phase3.v5a.vcf.gz
 │   └── chrX.1kg.phase3.v5a.vcf.gz.tbi
 ├── plinkmap
-│   ├── plink.chr10.GRCh37.map
-│   ├── plink.chr11.GRCh37.map
-│   ├── plink.chr12.GRCh37.map
-│   ├── plink.chr13.GRCh37.map
-│   ├── plink.chr14.GRCh37.map
-│   ├── plink.chr15.GRCh37.map
-│   ├── plink.chr16.GRCh37.map
-│   ├── plink.chr17.GRCh37.map
-│   ├── plink.chr18.GRCh37.map
-│   ├── plink.chr19.GRCh37.map
 │   ├── plink.chr1.GRCh37.map
-│   ├── plink.chr20.GRCh37.map
-│   ├── plink.chr21.GRCh37.map
-│   ├── plink.chr22.GRCh37.map
-│   ├── plink.chr2.GRCh37.map
-│   ├── plink.chr3.GRCh37.map
-│   ├── plink.chr4.GRCh37.map
-│   ├── plink.chr5.GRCh37.map
-│   ├── plink.chr6.GRCh37.map
-│   ├── plink.chr7.GRCh37.map
-│   ├── plink.chr8.GRCh37.map
-│   ├── plink.chr9.GRCh37.map
+│   ├── ...
 │   └── plink.chrX.GRCh37.map
 ├── shapeit
-│   ├── chr10.b37.gmap.gz
-│   ├── chr10.b38.gmap.gz
-│   ├── chr11.b37.gmap.gz
-│   ├── chr11.b38.gmap.gz
-│   ├── chr12.b37.gmap.gz
-│   ├── chr12.b38.gmap.gz
-│   ├── chr13.b37.gmap.gz
-│   ├── chr13.b38.gmap.gz
-│   ├── chr14.b37.gmap.gz
-│   ├── chr14.b38.gmap.gz
-│   ├── chr15.b37.gmap.gz
-│   ├── chr15.b38.gmap.gz
-│   ├── chr16.b37.gmap.gz
-│   ├── chr16.b38.gmap.gz
-│   ├── chr17.b37.gmap.gz
-│   ├── chr17.b38.gmap.gz
-│   ├── chr18.b37.gmap.gz
-│   ├── chr18.b38.gmap.gz
-│   ├── chr19.b37.gmap.gz
-│   ├── chr19.b38.gmap.gz
 │   ├── chr1.b37.gmap.gz
 │   ├── chr1.b38.gmap.gz
-│   ├── chr20.b37.gmap.gz
-│   ├── chr20.b38.gmap.gz
-│   ├── chr21.b37.gmap.gz
-│   ├── chr21.b38.gmap.gz
-│   ├── chr22.b37.gmap.gz
-│   ├── chr22.b38.gmap.gz
-│   ├── chr2.b37.gmap.gz
-│   ├── chr2.b38.gmap.gz
-│   ├── chr3.b37.gmap.gz
-│   ├── chr3.b38.gmap.gz
-│   ├── chr4.b37.gmap.gz
-│   ├── chr4.b38.gmap.gz
-│   ├── chr5.b37.gmap.gz
-│   ├── chr5.b38.gmap.gz
-│   ├── chr6.b37.gmap.gz
-│   ├── chr6.b38.gmap.gz
-│   ├── chr7.b37.gmap.gz
-│   ├── chr7.b38.gmap.gz
-│   ├── chr8.b37.gmap.gz
-│   ├── chr8.b38.gmap.gz
-│   ├── chr9.b37.gmap.gz
-│   ├── chr9.b38.gmap.gz
+│   ├── ...
 │   ├── chrX.b37.gmap.gz
 │   ├── chrX.b38.gmap.gz
-│   ├── chrX_par1.b37.gmap.gz
-│   ├── chrX_par1.b38.gmap.gz
-│   ├── chrX_par2.b37.gmap.gz
-│   └── chrX_par2.b38.gmap.gz
 └── tables
     ├── genetic_map_1cMperMb.txt
     ├── genetic_map_hg17_withX.txt.gz
