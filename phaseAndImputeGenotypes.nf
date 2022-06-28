@@ -18,6 +18,7 @@ include {
     shapeitPhaseWithRef;
     shapeitPhaseWithoutRef;
     getVcfIndex;
+    getVcfIndex as getPhasedVcfIndex;
     getCostumReferencePanel;
     getm3vcf;
     getMinimacReference;
@@ -71,7 +72,12 @@ workflow {
 
     if(params.impute == true) {
         println "\nMODE: IMPUTE\n"
-
+        if(params.impute_tool == 'minimac4') {
+            getPhasedVcfIndex(phased).set { vcf_fileset }
+            getMinimacReference().set{ minimac_ref_panel }
+            vcf_fileset.join(minimac_ref_panel).set{ minimac_input }
+            imputeVariantsWithMinimac4(minimac_input).view()
+        }
     }
 
     } else if(params.impute == true) {
@@ -81,7 +87,7 @@ workflow {
             validateVcf(vcf).map { chr, vcf_file, vcf_index -> tuple(chr.baseName, vcf_file, vcf_index) }.set { vcf_fileset }
             getMinimacReference().set{ minimac_ref_panel }
             vcf_fileset.join(minimac_ref_panel).set{ minimac_input }
-            imputeVariantsWithMinimac4(minimac_input).view()
+            imputeVariantsWithMinimac4(minimac_input)
         }
     } else if(params.impute == false) {
        error: println "\nWORKFLOW STOPPED: Please select a run mode - 'phase' and/or 'impute' -\n"
