@@ -113,7 +113,8 @@ params {
 ```
 
 The following tutorial will describe how to use the nextflow.config file to run jobs
----------
+
+--------------------
 A. PHASING WITHOUT REFERENCE (NO IMPUTATION)
 The parameter scope should look like this
 ```
@@ -131,6 +132,7 @@ nextflow run phaseAndImputeGenotypes.nf -w /path/to/work_directory/ -profile pbs
 - -profile: the profile selector is added to make it easy to run the workflow on any cluster/system and using reference panels in different genome builds. 
 Therefore, if your data set is in GRCh37 coordinate (hg19 or b37), then select hg19, etc.
 
+------------------
 B. IMPUTE GENOTYPES ONLY
 
 This requires pre-phased data in single chromosome VCF files, bgzipped and in a single directory. The directory must also contain the tabix indexed for each VCF file
