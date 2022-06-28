@@ -37,9 +37,9 @@ cacheDir = "${HOME}/singularity"
 ```
 This allows you to choose a location where the containers that are required will be stored.
 
-It is is best to pick a location with enough storage capacity as the total size of all the
+It is best to pick a location with enough storage capacity as the total size of all the
 containers could be upto 5GB
 
-2) ****
+2) > pbspro.config
 The following tutorial will describe clearly how to prepare the workflow and run it on a new cluster
 
