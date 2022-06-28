@@ -34,18 +34,17 @@ There are three main configuration scripts that need to be editted before runnin
 NB: All the scripts are located in the configs directory
 
 
-1) > containers.config
+1. > containers.config
 
 Edit the following line by replacing "${HOME}/singularity" with your own path
 ```
 cacheDir = "${HOME}/singularity"
 ```
 This allows you to choose a location where the containers that are required will be stored.
-
 It is best to pick a location with enough storage capacity as the total size of all the
 containers could be upto 5GB
 
-2) > pbspro.config
+2. > pbspro.config
 
 Edit this script to suit your cluster options.
 ```
@@ -55,10 +54,9 @@ executor {
     queueSize = 10                                              // increase of decrease the queue size according to your privileges 
 }
 
-includeConfig "${projectDir}/configs/base.config"
-includeConfig "${projectDir}/configs/containers.config"
-includeConfig "${projectDir}/configs/reference-hg38.config"
-includeConfig "${projectDir}/configs/reference-hg19.config"
+.
+.
+.
 
 process {
     beforeScript = 'module load chpc/singularity/3.5.3'         // load singularity according to your cluster directives
@@ -68,7 +66,7 @@ process {
 }
 ``` 
 
-3) > 
+3. > 
 
 The following tutorial will describe clearly how to prepare the workflow and run it on a new cluster
 
