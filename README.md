@@ -51,9 +51,7 @@ executor {
     queueSize = 10                                              // increase or decrease the queue size according to your privileges 
 }
 
-.
-.
-.
+...
 
 process {
     beforeScript = 'module load chpc/singularity/3.5.3'         // load singularity according to your cluster directives
@@ -79,6 +77,38 @@ params {
 }
 
 ```
+
+The panel directory should contain subdirectories with different reference data types. See the following folder structure
+```
+referencePanels
+├── hapmap
+│   ├── genetic_map_chr1_combined_b37.txt
+│   ├── ...
+│   ├── genetic_map_chr22_combined_b37.txt
+├── kgp
+│   ├── chr1.1kg.phase3.v5a.vcf.gz
+│   ├── chr1.1kg.phase3.v5a.vcf.gz.tbi
+│   ├── ...
+│   ├── chrX.1kg.phase3.v5a.vcf.gz
+│   └── chrX.1kg.phase3.v5a.vcf.gz.tbi
+├── plinkmap
+│   ├── plink.chr1.GRCh37.map
+│   ├── ...
+│   └── plink.chrX.GRCh37.map
+├── shapeit
+│   ├── chr1.b37.gmap.gz
+│   ├── chr1.b38.gmap.gz
+│   ├── ...
+│   ├── chrX.b37.gmap.gz
+│   ├── chrX.b38.gmap.gz
+└── tables
+    ├── genetic_map_1cMperMb.txt
+    ├── genetic_map_hg17_withX.txt.gz
+    ├── genetic_map_hg18_withX.txt.gz
+    ├── genetic_map_hg19_withX.txt.gz
+    └── genetic_map_hg38_withX.txt.gz
+```
+
 
 The above three scripts are only edited once to set up the workflow on a new cluster.
 
