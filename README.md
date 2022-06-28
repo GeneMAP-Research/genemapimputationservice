@@ -31,12 +31,9 @@ $ git clone https://github.com/esohkevin/siaImputationService.git
 
 There are three main configuration scripts that need to be editted before running the workflow
 
-NB: All the scripts are located in the configs directory
-
-
 1. > containers.config
 
-Edit the following line by replacing "${HOME}/singularity" with your own path
+The script is located in the configs directory. Edit the following line by replacing "${HOME}/singularity" with your own path
 ```
 cacheDir = "${HOME}/singularity"
 ```
@@ -46,12 +43,12 @@ containers could be upto 5GB
 
 2. > pbspro.config
 
-Edit this script to suit your cluster options.
+The script is located in the configs directory. Edit this script to suit your cluster options.
 ```
 executor {
     name = 'pbspro'
     queue = 'normal'                                            // replace 'normal' with your cluster queue option
-    queueSize = 10                                              // increase of decrease the queue size according to your privileges 
+    queueSize = 10                                              // increase or decrease the queue size according to your privileges 
 }
 
 .
@@ -66,7 +63,17 @@ process {
 }
 ``` 
 
-3. > 
+The above two scripts are only edited once to setup the workflow on a new cluster.
 
-The following tutorial will describe clearly how to prepare the workflow and run it on a new cluster
+The next script is the job configuration script which will be updated each time a different job is to be run
+
+3. > nextflow.config 
+
+The following tutorial will describe clearly how to use the nextflow.config file to run jobs
+
+A. PHASING WITHOUT REFERENCE (NO IMPUTATION)
+  - Make the following changes
+    ```
+     
+    ```
 
