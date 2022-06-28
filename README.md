@@ -41,5 +41,6 @@ It is best to pick a location with enough storage capacity as the total size of 
 containers could be upto 5GB
 
 2) > pbspro.config
+
 The following tutorial will describe clearly how to prepare the workflow and run it on a new cluster
 
