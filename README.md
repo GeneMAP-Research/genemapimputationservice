@@ -67,13 +67,13 @@ process {
 
 There are two config files for reference sequences/panels: reference-hg19.config and reference-hg38.config
 
-The files are located in the configs directory. Edite them accordingly to point the workflow to the appropriate reference sequence/panels location
+The files are located in the configs directory. Edit them accordingly to point the workflow to the appropriate reference sequence/panels location
 
 For instance, for reference-hg19.config
 ```
 params {
     panel_dir = ''			// directory where imputation reference panels are stored or will be stored
-    ref_dir = ''			// directory container fasta reference sequence
+    ref_dir = ''			// directory containing fasta reference sequence
     fastaRef = ''			// name of the fasta reference sequence
     buildVersion = 'hg19'		// DO NOT EDIT THIS LINE!!!
 }
@@ -112,10 +112,10 @@ params {
 }
 ```
 
-The following tutorial will describe clearly how to use the nextflow.config file to run jobs
+The following tutorial will describe how to use the nextflow.config file to run jobs
 ---------
 A. PHASING WITHOUT REFERENCE (NO IMPUTATION)
-The parameters scope should look like this
+The parameter scope should look like this
 ```
 phase = true
 with_ref = false
@@ -123,7 +123,7 @@ impute = false
 phase_tool = 'shapeit4'
 impute_tool = 'minimac4'
 ```
-Then run workflow as follows
+Then run the workflow as follows
 ```
 nextflow run phaseAndImputeGenotypes.nf -w /path/to/work_directory/ -profile pbspro,hg19
 ```
@@ -131,15 +131,29 @@ nextflow run phaseAndImputeGenotypes.nf -w /path/to/work_directory/ -profile pbs
 - -profile: the profile selector is added to make it easy to run the workflow on any cluster/system and using reference panels in different genome builds. 
 Therefore, if your data set is in GRCh37 coordinate (hg19 or b37), then select hg19, etc.
 
+B. IMPUTE GENOTYPES ONLY
 
-B. PHASING WITHOUT REFERENCE AND THEN IMPUTATION
-The parameters scope should look like this
+This requires pre-phased data in single chromosome VCF files, bgzipped and in a single directory. The directory must also contain the tabix indexed for each VCF file
+The directory of the pre-phased data is supplied using ```input_dir = ''``` in the nextflow.config file
+
+
+Example
 ```
-phase = true
-with_ref = false
-impute = true
-phase_tool = 'shapeit4'                 
-impute_tool = 'minimac4'
+chr1.vcf.gz
+chr1.vcf.gz.tbi
+.
+.
+.
+chrX.vcf.gz
+chrX.vcf.gz.tbi
+```
+NB: The directory must only contain the VCF files to be process (and their indexes) and must not contain any other files ending in '.vcf.gz'
+
+C. PHASING WITHOUT REFERENCE AND THEN IMPUTE GENOTYPES
+
+Make the following change in the nextflow.config script ```impute = true``` then run the workflow
+```
+nextflow run phaseAndImputeGenotypes.nf -w /path/to/work_directory/ -profile pbspro,hg19
 ```
 
 
