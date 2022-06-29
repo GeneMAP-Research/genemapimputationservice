@@ -432,7 +432,9 @@ process imputeVariantsWithMinimac4() {
         publishDir path: "${params.out_dir}/imputed/", mode: 'copy'
         tuple \
             val(chrom), \
-            path("chr${chrom}*")
+            path("chr${chrom}.dose.vcf.gz"), \
+            path("chr${chrom}.info.gz"), \
+            path("chr${chrom}.logfile")
     script:
         """
         minimac4 \
@@ -446,5 +448,7 @@ process imputeVariantsWithMinimac4() {
           --ChunkLengthMb 5 \
           --ChunkOverlapMb 0.0025 \
           --noPhoneHome
+
+        bgzip -f chr${chrom}.info
         """
 }

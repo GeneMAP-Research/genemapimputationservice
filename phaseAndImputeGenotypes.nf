@@ -64,7 +64,7 @@ workflow {
             } else {
                 geneticmap = getShapeitGeneticMap()
                 vcfFileset.join(geneticmap).set { phase_input }
-                phased = shapeitPhaseWithoutRef(phase_input).view()
+                shapeitPhaseWithoutRef(phase_input).view().set { phased }
           }
        } else if(params.phase_tool == 'beagle5') {
           geneticmap = getPlinkGeneticMap()
