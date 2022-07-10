@@ -71,6 +71,7 @@ workflow {
           geneticmap = getPlinkGeneticMap()
        }
     } else if(params.phase == false && params.impute == true) {
+        println "\nMODE: IMPUTE ONLY\n"
         
         getVcf().set { vcf }
         getChromosomes().set { chromosome }
@@ -80,7 +81,6 @@ workflow {
         vcf_fileset.map { chr, vcf, index -> tuple("${chr}", vcf, index) }.set { vcfFileset }
 
         if(params.impute_tool == 'minimac4') {
-            println "\nMODE: IMPUTE ONLY\n"
             vcf = getPhasedVcf()
             validateVcf(vcf).map { chr, vcf_file, vcf_index -> tuple(chr.baseName, vcf_file, vcf_index) }.set { vcf_fileset }
             getMinimacReference().set{ minimac_ref_panel }
