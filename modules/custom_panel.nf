@@ -1,7 +1,5 @@
 def getPhasedVcf() {
-    return channel.fromFilePairs(params.input_dir + "*.{vcf.gz,vcf.gz.tbi}", checkIfEmpty: true)
-                  .map { vcf_name, vcf_fileset -> tuple(vcf_name, vcf_fileset.first(), vcf_fileset.last()) }
-                  
+    return channel.fromPath(params.input_dir + "*.vcf.gz")
 }
 
 def getValidationExitStatus(exit_code) {
@@ -20,15 +18,11 @@ process validateVcf() {
     label 'mediumMemory'
     cache 'lenient'
     input:
-        tuple \
-            val(vcf_name), \
-            path(vcf_input), \
-            path(vcf_index)
+        path vcf_input
     output:
         tuple \
             path("*"), \
-            path(vcf_input), \
-            path(vcf_index)
+            path(vcf_input)
     script:
         //exit_code = 'success'
         """

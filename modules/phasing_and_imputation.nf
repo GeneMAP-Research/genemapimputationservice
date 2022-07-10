@@ -2,9 +2,29 @@ def getVcf() {
     return channel.fromPath( params.vcf )
 }
 
-def getChromosomes() {
+def listChromosomes() {
     return channel.of(1..22, 'X')
 }
+
+def getChromosomes() {
+    if(params.autosome == true) {
+       channel.of(1..22)
+    } else {
+       channel.of(1..22, 'X')
+    }
+}
+
+/*
+def getVcfFileset() {
+    getVcf().set { vcf }
+    getChromosomes().set { chromosome }
+    chromosome.combine(vcf).set { split_vcf_input }
+    splitVcfByChrom(split_vcf_input).set { per_chr_vcf }
+    getVcfIndex(per_chr_vcf).set { vcf_fileset }
+    vcf_fileset.map { chr, vcf, index -> tuple("${chr}", vcf, index) }.set { vcfFileset }
+    return vcfFileset
+}
+*/
 
 def getThousandGenomesReference() {
     return channel.fromFilePairs( params.panel_dir + "/kgp/chr*1kg.phase3.v5a.vcf.{gz,gz.tbi}", size: 2 )
@@ -75,8 +95,8 @@ process getVcfIndex() {
     label 'mediumMemory'
     input:
         tuple \
-        val(chrom), \
-        path(input_vcf)
+            val(chrom), \
+            path(input_vcf)
     output:
         tuple \
             val(chrom), \
@@ -117,15 +137,24 @@ process splitVcfByChrom() {
         """
 }
 
-process alignGenotypesToReference() {
+process checkStrand() {
     tag "processing chr${chrom}"
     label 'beagle'
     label 'alignGenotypes'
     input:
-	tuple val(chrom), path(input_vcf), path(ref_vcf), path(ref_index), path(geneticMap)
+	tuple \
+            val(chrom), \
+            path(input_vcf), \
+            path(vcf_index), \
+            path(ref_vcf), \
+            path(ref_index), \
+            path(geneticMap)
     output:
 	publishDir path: "${params.out_dir}", mode: 'copy'
-        tuple val("${chrom}"), path("chr${chrom}-aligned.vcf.gz"), path("chr${chrom}-aligned.log")
+        tuple \
+            val("${chrom}"), \
+            path("chr${chrom}-aligned.vcf.gz"), \
+            path("chr${chrom}-aligned.log")
     script:
 	"""
 	conform-gt \
@@ -316,7 +345,6 @@ process getm3vcf() {
           --processReference \
           --prefix chr${chrom} \
           --cpus ${task.cpus} \
-          --rsid
         """
 }
 
@@ -443,7 +471,6 @@ process imputeVariantsWithMinimac4() {
           --log chr${chrom} \
           --prefix chr${chrom} \
           --cpus ${task.cpus} \
-          --rsid \
           --allTypedSites \
           --ChunkLengthMb 5 \
           --ChunkOverlapMb 0.0025 \

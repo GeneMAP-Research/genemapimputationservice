@@ -4,14 +4,15 @@ nextflow.enable.dsl = 2
 
 include {
     getChromosomes;
+    listChromosomes;
     getHapmapGeneticMap;
     getPlinkGeneticMap;
     getEagleHapmapGeneticMap;
     getShapeitGeneticMap;
     getThousandGenomesReference;
     getVcf;
+    //getVcfFileset;
     splitVcfByChrom;
-    alignGenotypesToReference;
     beaglephase;
     eaglePhaseWithoutRef;
     eaglePhaseWithRef;
@@ -32,10 +33,10 @@ include {
 
 workflow {
 
-    if(params.phase == true) {
-       println "\nPHASE MODE ON!\n"
-
-       chromosome = getChromosomes()
+    if(params.phase == true && params.impute == false) {
+       println "\nMODE: PHASE ONLY\n"
+   
+       getChromosomes().set { chromosome }
        vcf = getVcf()
        chromosome.combine(vcf).set { split_vcf_input }
        per_chr_vcf = splitVcfByChrom(split_vcf_input)
@@ -69,18 +70,15 @@ workflow {
        } else if(params.phase_tool == 'beagle5') {
           geneticmap = getPlinkGeneticMap()
        }
+    } else if(params.phase == false && params.impute == true) {
+        
+        getVcf().set { vcf }
+        getChromosomes().set { chromosome }
+        chromosome.combine(vcf).set { split_vcf_input }
+        splitVcfByChrom(split_vcf_input).set { per_chr_vcf }
+        getVcfIndex(per_chr_vcf).set { vcf_fileset }
+        vcf_fileset.map { chr, vcf, index -> tuple("${chr}", vcf, index) }.set { vcfFileset }
 
-    if(params.impute == true) {
-        println "\nMODE: IMPUTE\n"
-        if(params.impute_tool == 'minimac4') {
-            getPhasedVcfIndex(phased).set { vcf_fileset }
-            getMinimacReference().set{ minimac_ref_panel }
-            vcf_fileset.join(minimac_ref_panel).set{ minimac_input }
-            imputeVariantsWithMinimac4(minimac_input).view()
-        }
-    }
-
-    } else if(params.impute == true) {
         if(params.impute_tool == 'minimac4') {
             println "\nMODE: IMPUTE ONLY\n"
             vcf = getPhasedVcf()
@@ -89,56 +87,56 @@ workflow {
             vcf_fileset.join(minimac_ref_panel).set{ minimac_input }
             imputeVariantsWithMinimac4(minimac_input)
         }
-    } else if(params.impute == false) {
-       error: println "\nWORKFLOW STOPPED: Please select a run mode - 'phase' and/or 'impute' -\n"
-    } 
+    } else if(params.phase == true && params.impute == true) {
+        println "\nMODE: PHASE AND IMPUTE\n"
 
+        getVcf().set { vcf }
+        getChromosomes().set { chromosome }
+        chromosome.combine(vcf).set { split_vcf_input }
+        splitVcfByChrom(split_vcf_input).set { per_chr_vcf }
+        getVcfIndex(per_chr_vcf).set { vcf_fileset }
+        vcf_fileset.map { chr, vcf, index -> tuple("${chr}", vcf, index) }.set { vcfFileset }
 
+        if(params.phase_tool == 'eagle2' && params.impute_tool == 'minimac4') {
+             if(params.with_ref == true) {
+                 getEagleHapmapGeneticMap().set { geneticmap }
+                 getThousandGenomesReference().set { refpanel }
+                 refpanel.combine(geneticmap).set { panel_map }
+                 vcfFileset.join(panel_map).set { phase_input }
+                 eaglePhaseWithRef(phase_input).set { phased }
+             } else {
+                 getEagleHapmapGeneticMap().set { geneticmap}
+                 vcfFileset.combine(geneticmap).set { phase_input }
+                 eaglePhaseWithoutRef(phase_input).set {phased }
+             }
 
-/*
-    chromosome = getChromosomes()
+             getPhasedVcfIndex(phased).set { phased_vcf_fileset }
+             getMinimacReference().set{ minimac_ref_panel }
+             phased_vcf_fileset.join(minimac_ref_panel).set{ minimac_input }
+             imputeVariantsWithMinimac4(minimac_input)
 
-    vcf = getVcf()
-    chromosome.combine(vcf).set { split_vcf_input }
-    per_chr_vcf = splitVcfByChrom(split_vcf_input)
-    vcf_fileset = getVcfIndex(per_chr_vcf)
-    plinkGeneticMap = getPlinkGeneticMap()
-    eagleGeneticMap = getEagleHapmapGeneticMap().view()
+        } else if(params.phase_tool == 'shapeit4' && params.impute_tool == 'minimac4') {
+             if(params.with_ref == true) {
+                 geneticmap = getShapeitGeneticMap()
+                 refpanel = getThousandGenomesReference()
+                 refpanel.join(geneticmap).set { panel_map }
+                 vcfFileset.join(panel_map).set { phase_input }
+                 phased = shapeitPhaseWithRef(phase_input).view()
+             } else {
+                 geneticmap = getShapeitGeneticMap()
+                 vcfFileset.join(geneticmap).set { phase_input }
+                 shapeitPhaseWithoutRef(phase_input).view().set { phased }
+             }
 
-    refPanel = getCostumReferencePanel()
-    vcf_fileset.map { chr, vcf, index -> tuple("${chr}", vcf, index) }.set { vcfFileset }
-    refPanel.map { chr, vcf, index -> tuple("${chr}", vcf, index) }.set { ref_panel }
-    vcfFileset.join(ref_panel).set { phase_input }
-    phase_input.join(plinkGeneticMap).set { impute_input }
+             getPhasedVcfIndex(phased).set { phased_vcf_fileset }
+             getMinimacReference().set{ minimac_ref_panel }
+             phased_vcf_fileset.join(minimac_ref_panel).set{ minimac_input }
+             imputeVariantsWithMinimac4(minimac_input)
 
-    beaglephase(impute_input)
-
-
-    thousandGenomesReference = getThousandGenomesReference().view()
-
-    //vcf = getVcf()
-
-    chromosome
-        .combine(vcf)
-        .set { splitvcf_input }
-    
-    perChromosomeVcfFiles = splitVcfByChrom( splitvcf_input )   
-    perChromosomeVcfFiles
-	.map { chrom, vcfFile -> tuple( "${chrom}", vcfFile ) }
-	.join( thousandGenomesReference )
-	.join( geneticMap )
-	.set { checkstrand_input }
-
-    alignedVcfs = alignGenotypesToReference( checkstrand_input )
-    alignedVcfs
-        .map { chrom, vcfFile, logFile -> tuple( "${chrom}", vcfFile, logFile ) }
-        .join( thousandGenomesReference )
-        .join( geneticMap )
-        .set { phasing_input }
-
-    phasedVcfFiles = phaseGenotypes( phasing_input )
-    getVcfIndex(phasedVcfFiles).view()
-
-    prePhasingQualityReports = getCheckStrandReports()
-*/
-}
+        } else if(params.phase_tool == 'beagle5') {
+           geneticmap = getPlinkGeneticMap()
+        }
+    } else {
+        error: println "\nWORKFLOW STOPPED: Please select a run mode - 'phase' and/or 'impute' -\n"
+    }
+} 

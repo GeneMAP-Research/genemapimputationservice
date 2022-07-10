@@ -28,7 +28,8 @@ include {
 workflow {
     chromosome = getChromosomes()
     vcf = getPhasedVcf()
-    validateVcf(vcf).map { chr, vcf_file, vcf_index -> tuple(chr.baseName, vcf_file, vcf_index) }.set { vcf_fileset }
+    validateVcf(vcf).map { chr, vcf_file -> tuple(chr.baseName, vcf_file) }.set { chrom_vcf }
+    getVcfIndex(chrom_vcf).view().set { vcf_fileset }
 
 /*
     hapmapGeneticMap = getEagleHapmapGeneticMap()
