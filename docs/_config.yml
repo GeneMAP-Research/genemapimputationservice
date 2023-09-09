@@ -1,5 +1,5 @@
 remote_theme: just-the-docs/just-the-docs
-logo: assets/img/esohinformatics_gitlogo.png
+#logo: assets/img/esohinformatics_gitlogo.png
 favicon_ico: assets/img/favicon.ico
 
 #baseurl: ""
