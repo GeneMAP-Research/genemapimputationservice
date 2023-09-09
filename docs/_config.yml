@@ -6,9 +6,9 @@ favicon_ico: assets/img/favicon.ico
 
 
 baseurl: ""
-url: "https://sia-imputation-service.com"
-#repository: esohkevin/siaImputationService
+url: "https://esohkevin.github.io/siaImputationService/"
+repository: esohkevin/siaImputationService
 
-#permalink: pretty
+permalink: pretty
 
 color_scheme: "dark"
