@@ -6,8 +6,8 @@ favicon_ico: assets/img/favicon.ico
 
 
 baseurl: ""
-url: "https://siaImputationService.com"
-repository: esohkevin/siaImputationService
+url: https://sia-imputation-service.com
+#repository: esohkevin/siaImputationService
 
 permalink: pretty
 
