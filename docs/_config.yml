@@ -61,6 +61,9 @@ aux_links_new_tab: false
 heading_anchors: true
 
 
-
+callouts:
+  warning:
+    title: Warning
+    color: red
 
 

@@ -7,3 +7,5 @@ layout: default
 
 Check out the workflows [here](/README.md)
 
+{: .warning}
+A warning
