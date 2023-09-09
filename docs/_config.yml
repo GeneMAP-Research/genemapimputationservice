@@ -5,7 +5,7 @@ favicon_ico: assets/img/favicon.ico
 
 
 
-baseurl: ""
+#baseurl: ""
 #url: "https://sia-imputation-service.com"
 #repository: esohkevin/siaImputationService
 
