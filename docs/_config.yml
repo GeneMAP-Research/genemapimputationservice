@@ -46,7 +46,7 @@ mermaid:
 
 # Aux links for the upper right navigation
 aux_links:
-  "SIAIS on GitHub":
+  "GIS on GitHub":
     - "https://github.com/esohkevin/siaImputationService/"
   "<p align=\"center\"><img src=\"assets/img/esohinformatics_gitlogo.png\" height=\"60%\" width=\"60%\"></p>":
     - "https://esohkevin.github.io/"
@@ -63,6 +63,6 @@ heading_anchors: true
 callouts:
   warning:
     title: Warning
-    color: orange
+    color: red
 
 
