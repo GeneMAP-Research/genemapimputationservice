@@ -3,7 +3,7 @@ logo: assets/img/esohinformatics_gitlogo.png
 favicon_ico: assets/img/favicon.ico
 
 baseurl: ""
-url: "https://siaImputationService.com"
+url: "https://sia-imputation-service.com"
 #repository: esohkevin/siaImputationService
 
 permalink: pretty
