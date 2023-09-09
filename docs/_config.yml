@@ -47,7 +47,7 @@ mermaid:
 aux_links:
   "SIAIS on GitHub":
     - "https://github.com/esohkevin/siaImputationService/"
-  "<img src=\"assets/img/esohinformatics_gitlogo.png\" height=\"60%\" width=\"60%\" align=\"right\">":
+  "<p align=\"center\"><img src=\"assets/img/esohinformatics_gitlogo.png\" height=\"60%\" width=\"60%\"></p>":
     - "https://esohkevin.github.io/"
 
 # Makes Aux links open in a new tab. Default is false
