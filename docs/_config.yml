@@ -2,8 +2,8 @@ remote_theme: just-the-docs/just-the-docs
 logo: assets/img/esohinformatics_gitlogo.png
 favicon_ico: assets/img/favicon.ico
 
-baseurl: ""
-url: "https://sia-imputation-service.com"
+#baseurl: ""
+#url: "https://sia-imputation-service.com"
 #repository: esohkevin/siaImputationService
 
 permalink: pretty
@@ -45,6 +45,8 @@ mermaid:
 
 # Aux links for the upper right navigation
 aux_links:
+  "<a href=\"https://esohkevin.github.io/\"> <img src=\"assets/img/esohinformatics_gitlogo.png\"> </a>":
+    "https://esohkevin.github.io/"
   "SIAIS on GitHub":
     - "https://github.com/esohkevin/siaImputationService/"
 
