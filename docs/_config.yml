@@ -45,10 +45,10 @@ mermaid:
 
 # Aux links for the upper right navigation
 aux_links:
-  "<img src=\"assets/img/esohinformatics_gitlogo.png\" height=\"80%\" width=\"80%\" align=\"right\">":
-    - "https://esohkevin.github.io/"
   "SIAIS on GitHub":
     - "https://github.com/esohkevin/siaImputationService/"
+  "<img src=\"assets/img/esohinformatics_gitlogo.png\" height=\"60%\" width=\"60%\" align=\"right\">":
+    - "https://esohkevin.github.io/"
 
 # Makes Aux links open in a new tab. Default is false
 aux_links_new_tab: false
