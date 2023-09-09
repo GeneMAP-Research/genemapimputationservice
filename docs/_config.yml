@@ -1,3 +1,10 @@
 remote_theme: just-the-docs/just-the-docs
 logo: assets/img/esohinformatics_gitlogo.png
+baseurl: ""
+url: "https://sia-imputation-service.com"
+repository: esohkevin/siaImputationService
+
+permalink: pretty
+
+color_scheme: dark
 #remote_theme: facebook/docusaurus
