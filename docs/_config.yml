@@ -1,3 +1,6 @@
+remote_theme: just-the-docs/just-the-docs
+logo: assets/img/esohinformatics_gitlogo.png
+
 # Welcome to Jekyll!
 #
 # This config file is meant for settings that affect your whole site, values
@@ -13,17 +16,13 @@
 # you will see them accessed via {{ site.title }}, {{ site.github_repo }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: Just the Docs
-description: A Jekyll theme for documentation
+title: SIA IMPUTATION SERVICE
+description: A Genotype Imputation Service for African Populations
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://siais.com" # the base hostname & protocol for your site, e.g. http://example.com
 repository: esohkevin/siaImputationService # for github-metadata
 
 permalink: pretty
-
-remote_theme: just-the-docs/just-the-docs
-logo: assets/img/esohinformatics_gitlogo.png
-
 
 # Set a path/url to a logo that will be displayed instead of the title
 #logo: "/assets/images/just-the-docs.png"
