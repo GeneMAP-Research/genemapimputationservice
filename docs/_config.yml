@@ -45,7 +45,7 @@ mermaid:
 
 # Aux links for the upper right navigation
 aux_links:
-  "<img src=\"assets/img/esohinformatics_gitlogo.png\" height=\"50%\" width=\"50%\">":
+  "<a href=""><img src=\"assets/img/esohinformatics_gitlogo.png\" height=\"50%\" width=\"50%\"></a>":
     - "https://esohkevin.github.io/"
   "SIAIS on GitHub":
     - "https://github.com/esohkevin/siaImputationService/"
