@@ -16,5 +16,5 @@ A warning
 This is a note
 
 
-{: .highlight }
+{: .hint }
 This is a hint
