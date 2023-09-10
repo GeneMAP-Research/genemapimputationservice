@@ -69,7 +69,6 @@ callouts:
     title: Warning
     color: red
 
-
 callouts:
   note:
     title: Note
