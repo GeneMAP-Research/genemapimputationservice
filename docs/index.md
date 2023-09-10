@@ -12,7 +12,6 @@ A warning
 
 
 
-
 {: .note }
 This is a note
 

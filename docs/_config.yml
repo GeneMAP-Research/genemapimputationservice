@@ -68,13 +68,9 @@ callouts:
   warning:
     title: Warning
     color: red
-
-callouts:
   note:
     title: Note
     color: yellow
-
-callouts:
-  highlight:
-    title: highlight
+  hint:
+    title: Hint
     color: purple
