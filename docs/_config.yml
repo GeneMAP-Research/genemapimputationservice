@@ -63,7 +63,7 @@ heading_anchors: true
 
 
 # callouts preset colors (grey-lt, grey-dk, purple, blue, green, yellow, and red)
-callouts_opacity: 0.2
+callouts_opacity: 0.5
 
 callouts:
   warning:
