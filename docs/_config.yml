@@ -10,7 +10,7 @@ favicon_ico: assets/img/favicon.ico
 
 permalink: pretty
 
-color_scheme: "dark"
+color_scheme: "light"
 
 # Enable or disable the site search
 # Supports true (default) or false
@@ -63,7 +63,7 @@ heading_anchors: true
 
 
 # callouts preset colors (grey-lt, grey-dk, purple, blue, green, yellow, and red)
-callouts_opacity: 0.5
+callouts_opacity: 0.3
 
 callouts:
   warning:
