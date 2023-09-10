@@ -75,6 +75,6 @@ callouts:
     color: yellow
 
 callouts:
-  hint:
-    title: Hint
+  highlight:
+    title: highlight
     color: purple

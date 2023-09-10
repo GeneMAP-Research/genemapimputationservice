@@ -11,14 +11,12 @@ Check out the workflows [here](/README.md)
 A warning
 
 
----
 
 
 {: .note }
 This is a note
 
----
 
 
-{: .hint }
+{: .highlight }
 This is a hint
