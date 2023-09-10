@@ -9,7 +9,9 @@ favicon_ico: assets/img/favicon.ico
 
 permalink: pretty
 
-color_scheme: "dark"
+#color_scheme: "dark"
+
+jtd.setTheme("dark")
 
 # Enable or disable the site search
 # Supports true (default) or false
