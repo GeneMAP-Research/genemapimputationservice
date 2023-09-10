@@ -18,3 +18,7 @@ This is a note
 
 {: .hint }
 This is a hint
+
+
+{: .highlight }
+This is a highlight

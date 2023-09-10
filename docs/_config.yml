@@ -74,3 +74,5 @@ callouts:
   hint:
     title: Hint
     color: purple
+  highlight:
+    color: grey-lt
