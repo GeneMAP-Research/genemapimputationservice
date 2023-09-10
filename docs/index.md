@@ -7,17 +7,17 @@ layout: default
 
 Check out the workflows [here](/README.md)
 
-{: .warning}
+{: .warning }
 A warning
 
 break
 
 
-{: .note}
+{: .note }
 This is a note
 
 break
 
 
-{: .hint}
+{: .hint }
 This is a hint
