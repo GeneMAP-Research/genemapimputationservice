@@ -24,6 +24,6 @@ This is a hint
 This is a highlight
 
 {: .question }
-This is a qustion
+> This is a qustion
 > {: .hint }
 > Here is a hint
