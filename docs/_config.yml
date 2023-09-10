@@ -9,9 +9,7 @@ favicon_ico: assets/img/favicon.ico
 
 permalink: pretty
 
-#color_scheme: "dark"
-
-jtd.setTheme("dark")
+color_scheme: "dark"
 
 # Enable or disable the site search
 # Supports true (default) or false
@@ -63,9 +61,21 @@ aux_links_new_tab: false
 heading_anchors: true
 
 
+# callouts preset colors (grey-lt, grey-dk, purple, blue, green, yellow, and red)
+callouts_opacity: 0.3
+
 callouts:
   warning:
     title: Warning
     color: red
 
 
+callouts:
+  note:
+    title: Note
+    color: yellow
+
+callouts:
+  hint:
+    title: Hint
+    color: purple

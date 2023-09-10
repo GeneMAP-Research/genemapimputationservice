@@ -9,3 +9,9 @@ Check out the workflows [here](/README.md)
 
 {: .warning}
 A warning
+
+{: .note}
+This is a note
+
+{: .hint}
+This is a hint
