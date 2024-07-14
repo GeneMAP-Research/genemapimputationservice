@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-#--- genemapgwas workflow wrapper ---#
+#--- genemapimputation workflow wrapper ---#
 
 function usage() {
    echo """
@@ -8,17 +8,17 @@ function usage() {
    GeneMAP-NGS ~ a wrapper for the nextflow-based genemapngs workflow
    ===================================================================
 
-   Usage: genemapngs <workflow> <profile> [options] ...
+   Usage: genemapis <workflow> <profile> [options] ...
 
            workflows:
            ---------
                test: Run test to see if workfow installed correctly.
               align: Check FASTQ or Alignment (BAM/CRAM) quality.
-               trim: Trim adapters and poor quality bases from reads.
-            varcall: Perform variant calling (both single and joint sample) in one run.
-           svarcall: Perform only sinlge sample variant calling to generate gVCF files.
-           jvarcall: Perform only joint (multi-sample) variant calling with pre-existing gVCF files.
-          varfilter: Filter variant calls in VCF/BCF files.
+               xxxx: Trim adapters and poor quality bases from reads.
+            xxxxxxx: .
+           xxxxxxxx: .
+           xxxxxxxx: .
+          xxxxxxxxx: .
 
 
            profiles: <executor>,<container>,<reference>
@@ -30,8 +30,8 @@ function usage() {
 
            examples:
            ---------
-         genemapngs qc slurm,singularity,hg38 [options]
-         genemapngs align local,singularity,hg19 --bfile BEDFILE --out MYOUT --outdir MYPATH --pheno_file MYPHENO
+         genemapngs test slurm,singularity,hg38 [options]
+         genemapngs align local,singularity,hg19 --vcf my-vcf.vcf.gz 
    """
 }
 

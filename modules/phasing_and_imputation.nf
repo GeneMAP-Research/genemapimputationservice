@@ -213,7 +213,12 @@ process checkStrand() {
     label 'beagle'
     label 'alignGenotypes'
     publishDir \
-        path: "${params.output_dir}/aligned/", \
+        pattern: "chr${chrom}-aligned.vcf.gz", \
+        path: "${params.output_dir}/aligned/vcf/", \
+        mode: 'copy'
+    publishDir \
+        pattern: "chr${chrom}-aligned.log", \
+        path: "${params.output_dir}/aligned/logs/", \
         mode: 'copy'
     input:
 	tuple \
