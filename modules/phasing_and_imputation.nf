@@ -7,7 +7,7 @@ def listChromosomes() {
 }
 
 def getChromosomes() {
-    if(params.autosome == true) {
+    if(params.autosome == "true") {
        channel.of(1..22)
     } else {
        channel.of(1..22, 'X')
@@ -61,7 +61,7 @@ def getShapeitGeneticMap() {
 }
 
 def getHapmapGeneticMap() {
-    return channel.fromFilePairs( params.panel_dir + "/hapmap/genetic_map_chr*_combined_b37.txt", size: 1 )
+    return channel.fromFilePairs( params.panel_dir + "/hapmap/genetic_map_chr*_combined.txt", size: 1 )
                   .map { chr, map_file ->
                          tuple( chr.replaceFirst(/genetic_map_chr/,""), map_file.first() )
                   }
@@ -112,9 +112,50 @@ process getVcfIndex() {
         """
 }
 
+process removeDupVarsAndIndexVcf() {
+    tag "BCFTOOLS INDEX: ${input_vcf}"
+    label 'bcftools'
+    label 'mediumMemory'
+    input:
+        tuple \
+            val(chrom), \
+            path(input_vcf)
+    output:
+        tuple \
+            val(chrom), \
+            path("${input_vcf.simpleName}-biallelic-snps.vcf.gz"), \
+            path("${input_vcf.simpleName}-biallelic-snps.vcf.gz.tbi")
+    script:
+        """
+        bcftools \
+            sort \
+            -Oz \
+            -o ${input_vcf.baseName}-sorted.vcf.gz \
+            ${input_vcf}
+
+        bcftools \
+            norm \
+            -m + \
+            -Oz \
+            ${input_vcf.baseName}-sorted.vcf.gz | \
+        bcftools \
+            view \
+            -v snps \
+            -m2 \
+            -M2 \
+            -Oz | \
+        tee ${input_vcf.simpleName}-biallelic-snps.vcf.gz | \
+        bcftools \
+            index \
+            -ft \
+            --threads ${task.cpus} \
+            -o ${input_vcf.simpleName}-biallelic-snps.vcf.gz.tbi \
+        """
+}
+
 process splitVcfByChrom() {
     tag "processing chr${chrom}"
-    label 'plink2'
+    label 'plink'
     label 'splitVCF'
     cache 'lenient'
     input:
@@ -137,10 +178,43 @@ process splitVcfByChrom() {
         """
 }
 
+process sortIndexVcf() {
+    tag "BCFTOOLS INDEX: ${input_vcf}"
+    label 'bcftools'
+    label 'mediumMemory'
+    input:
+        tuple \
+            val(chrom), \
+            path(input_vcf)
+    output:
+        tuple \
+            val(chrom), \
+            path("${input_vcf.baseName}-sorted.vcf.gz"), \
+            path("${input_vcf.baseName}-sorted.vcf.gz.tbi")
+    script:
+        """
+        bcftools \
+            sort \
+            --threads ${task.cpus} \
+            -Oz \
+            -o ${input_vcf.baseName}-sorted.vcf.gz \
+            ${input_vcf}
+
+        bcftools \
+            index \
+            -ft \
+            --threads ${task.cpus} \
+            ${input_vcf.baseName}-sorted.vcf.gz
+        """
+}
+
 process checkStrand() {
     tag "processing chr${chrom}"
     label 'beagle'
     label 'alignGenotypes'
+    publishDir \
+        path: "${params.output_dir}/aligned/", \
+        mode: 'copy'
     input:
 	tuple \
             val(chrom), \
@@ -150,21 +224,70 @@ process checkStrand() {
             path(ref_index), \
             path(geneticMap)
     output:
-	publishDir path: "${params.out_dir}", mode: 'copy'
         tuple \
-            val("${chrom}"), \
+            val(chrom), \
             path("chr${chrom}-aligned.vcf.gz"), \
             path("chr${chrom}-aligned.log")
     script:
+    if(params.exclude_sample == "NULL")
+        """
+        conform-gt \
+            gt="${input_vcf}" \
+            ref="${ref_vcf}" \
+            chrom=${chrom} \
+            match=POS \
+            out="chr${chrom}-aligned"
+        """
+    else
 	"""
 	conform-gt \
 	    gt="${input_vcf}" \
 	    ref="${ref_vcf}" \
 	    chrom=${chrom} \
 	    match=POS \
-            excludesamples="${params.RefereceSamplesToExclude}" \
+            excludesamples="${params.exclude_sample}" \
 	    out="chr${chrom}-aligned"
 	"""
+}
+
+process concatVcfs() {
+    tag "concatenating VCFs into ${params.output_prefix}_aligned.vcf.gz..."
+    label 'bcftools'
+    label 'mediumMemory'
+    publishDir \
+        path: "${params.output_dir}/aligned/combined/", \
+        mode: 'copy'
+    input:
+        path(vcf)
+    output:
+        path("${params.output_prefix}_aligned.vcf.gz*")
+    script:
+        """
+        ls *.vcf.gz | sort -V > aligned_vcf_list.txt
+        bcftools \
+            concat \
+            -f aligned_vcf_list.txt \
+            -a \
+            --threads {task.cpus} \
+            -Oz | \
+        bcftools \
+            norm \
+            -m+ \
+            --threads {task.cpus} \
+            -Oz | \
+        bcftools \
+            view \
+            -v snps \
+            -m2 -M2 \
+            --threads {task.cpus} \
+            -Oz | \
+        tee ${params.output_prefix}_aligned.vcf.gz | \
+        bcftools \
+            index \
+            -ft \
+            --threads ${task.cpus} \
+            -o ${params.output_prefix}_aligned.vcf.gz.tbi
+        """
 }
 
 process beaglephase() {
@@ -174,7 +297,7 @@ process beaglephase() {
     input:
 	tuple val(chrom), path(input_vcf), path(vcf_index), path(ref_vcf), path(ref_index), path(geneticMap)
     output:
-	publishDir path: "${params.out_dir}", mode: 'copy'
+	publishDir path: "${params.output_dir}", mode: 'copy'
 	tuple \
             val(chrom), \
             path("chr${chrom}.*.vcf.gz")
@@ -211,10 +334,11 @@ process eaglePhaseWithoutRef() {
             path(vcf_index), \
             path(geneticMap)
     output:
-        publishDir path: "${params.out_dir}", mode: 'copy'
+        publishDir path: "${params.output_dir}", mode: 'copy'
         tuple \
             val(chrom), \
-            path("chr${chrom}.${params.out_prefix}.eagle2.noref.vcf.gz")
+            path("chr${chrom}.${params.out_prefix}.eagle2.noref.vcf.gz"), \
+            path("chr${chrom}.${params.out_prefix}.eagle2.noref.log")            
     script:
         """
         eagle \
@@ -243,10 +367,11 @@ process eaglePhaseWithRef() {
             path(ref_index), \
             path(geneticMap)
     output:
-        publishDir path: "${params.out_dir}", mode: 'copy'
+        publishDir path: "${params.output_dir}", mode: 'copy'
         tuple \
             val(chrom), \
-            path("chr${chrom}.${params.out_prefix}.eagle2.vcf.gz")
+            path("chr${chrom}.${params.out_prefix}.eagle2.vcf.gz"), \
+            path("chr${chrom}.${params.out_prefix}.eagle2.log")
     script:
         """
         eagle \
@@ -274,7 +399,7 @@ process shapeitPhaseWithoutRef() {
             path(vcf_index), \
             path(geneticMap)
     output:
-        publishDir path: "${params.out_dir}", mode: 'copy'
+        publishDir path: "${params.output_dir}", mode: 'copy'
         tuple \
             val(chrom), \
             path("chr${chrom}.${params.out_prefix}.shapeit4.noref.vcf.gz")
@@ -305,7 +430,7 @@ process shapeitPhaseWithRef() {
             path(ref_index), \
             path(geneticMap)
     output:
-        publishDir path: "${params.out_dir}", mode: 'copy'
+        publishDir path: "${params.output_dir}", mode: 'copy'
         tuple \
             val(chrom), \
             path("chr${chrom}.${params.out_prefix}.shapeit4.vcf.gz")
@@ -359,7 +484,7 @@ process createLegendFile() {
             path(input_vcf), \
             path(vcf_index)
     output:
-        publishDir path: "${params.out_dir}", mode: 'copy'
+        publishDir path: "${params.output_dir}", mode: 'copy'
         tuple \
             val(chrom), \
             path(input_vcf), \
@@ -390,7 +515,7 @@ process prepareChrXPanel() {
             val(chrom), \
             path(input_vcf)
     output:
-        publishDir path: "${params.out_dir}", mode: 'copy'
+        publishDir path: "${params.output_dir}", mode: 'copy'
         tuple \
             val(chrom), \
             path("${input_vcf.simpleName}_PAR1.vcf.gz"), \
@@ -457,7 +582,7 @@ process imputeVariantsWithMinimac4() {
             path(ref_vcf), \
             path(rec)
     output:
-        publishDir path: "${params.out_dir}/imputed/", mode: 'copy'
+        publishDir path: "${params.output_dir}/imputed/", mode: 'copy'
         tuple \
             val(chrom), \
             path("chr${chrom}.dose.vcf.gz"), \
