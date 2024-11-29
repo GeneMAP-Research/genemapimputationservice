@@ -26,7 +26,7 @@ def getVcfFileset() {
 }
 */
 
-def getThousandGenomesReference() {
+def getKgpPanel() {
     return channel.fromFilePairs( params.panel_dir + "/kgp/chr*1kg.phase3.v5a.vcf.{gz,gz.tbi}", size: 2 )
                   .ifEmpty { error: println "\nAn error occurred! Please check that the reference file and its index '.tbi' exist...\n" }
 	   	  .map { chr, ref_file -> 
@@ -34,15 +34,15 @@ def getThousandGenomesReference() {
 	    	  }
 }
 
-def getMinimacReference() {
-    return channel.fromFilePairs( params.panel_dir + "/m3vcfs/*.{m3vcf.gz,rec,erate}", size: 3 )
+def getCustomM3Panel() {
+    return channel.fromFilePairs( params.panel_dir + "/custom/*.{m3vcf.gz,rec,erate}", size: 3 )
                   .ifEmpty { error: println "\nAn error occurred! Please check that the reference files exist...\n" }
                   .map { chr, ref_fileset ->
                          tuple( chr.replaceFirst(/chr/,""), ref_fileset[0], ref_fileset[1], ref_fileset[2])
                   }
 }
 
-def getCostumReferencePanel() {
+def getCustomVcfPanel() {
     return channel.fromFilePairs( params.panel_dir + "wgs_chr*_phased.vcf.{gz,gz.tbi}", size: 2 )
                   .ifEmpty { error "\nAn error occurred! Please check that the reference file and its index '.tbi' exist...\n" }
                   .map { chr, ref_file ->
@@ -51,24 +51,24 @@ def getCostumReferencePanel() {
 }
 
 def getEagleHapmapGeneticMap() {
-    return channel.fromPath( params.panel_dir + "/tables/genetic_map_hg19_withX.txt.gz" )
+    return channel.fromPath( params.map_dir + "/eagle/genetic_map_hg19_withX.txt.gz" )
 }
 
 def getShapeitGeneticMap() {
-    return channel.fromPath( params.panel_dir + "/shapeit/chr*.b37.gmap.gz" )
+    return channel.fromPath( params.map_dir + "/shapeit/chr*.b37.gmap.gz" )
                   .ifEmpty { error: println "\nAn error occurred! Please check that the map files exist...\n" }
                   .map { map -> tuple(map.simpleName.replaceAll(/chr/,""), map) }
 }
 
 def getHapmapGeneticMap() {
-    return channel.fromFilePairs( params.panel_dir + "/hapmap/genetic_map_chr*_combined.txt", size: 1 )
+    return channel.fromFilePairs( params.map_dir + "/hapmap/genetic_map_chr*_combined.txt", size: 1 )
                   .map { chr, map_file ->
                          tuple( chr.replaceFirst(/genetic_map_chr/,""), map_file.first() )
                   }
 }
 
 def getPlinkGeneticMap() {
-    return channel.fromFilePairs( params.panel_dir + '/plinkmap/plink.chr*.GRCh37.map', size: 1)
+    return channel.fromFilePairs( params.map_dir + '/plink/plink.chr*.GRCh37.map', size: 1)
                   .map { chr, map_file ->
                          tuple( chr.replaceFirst(/^plink\.chr/,""), map_file.first() )
                   }
@@ -342,8 +342,8 @@ process eaglePhaseWithoutRef() {
         publishDir path: "${params.output_dir}", mode: 'copy'
         tuple \
             val(chrom), \
-            path("chr${chrom}.${params.out_prefix}.eagle2.noref.vcf.gz"), \
-            path("chr${chrom}.${params.out_prefix}.eagle2.noref.log")            
+            path("chr${chrom}.${params.output_prefix}.eagle2.noref.vcf.gz"), \
+            path("chr${chrom}.${params.output_prefix}.eagle2.noref.log")            
     script:
         """
         eagle \
@@ -353,8 +353,8 @@ process eaglePhaseWithoutRef() {
           --numThreads=${task.cpus} \
           --Kpbwt=${params.kpbwt} \
           --vcfOutFormat=z \
-          --outPrefix=chr${chrom}.${params.out_prefix}.eagle2.noref 2>&1 | \
-          tee chr${chrom}.${params.out_prefix}.eagle2.noref.log
+          --outPrefix=chr${chrom}.${params.output_prefix}.eagle2.noref 2>&1 | \
+          tee chr${chrom}.${params.output_prefix}.eagle2.noref.log
         """
 }
 
@@ -375,8 +375,8 @@ process eaglePhaseWithRef() {
         publishDir path: "${params.output_dir}", mode: 'copy'
         tuple \
             val(chrom), \
-            path("chr${chrom}.${params.out_prefix}.eagle2.vcf.gz"), \
-            path("chr${chrom}.${params.out_prefix}.eagle2.log")
+            path("chr${chrom}.${params.output_prefix}.eagle2.vcf.gz"), \
+            path("chr${chrom}.${params.output_prefix}.eagle2.log")
     script:
         """
         eagle \
@@ -387,8 +387,8 @@ process eaglePhaseWithRef() {
           --numThreads=${task.cpus} \
           --Kpbwt=${params.kpbwt} \
           --vcfOutFormat=z \
-          --outPrefix=chr${chrom}.${params.out_prefix}.eagle2 2>&1 | \
-          tee chr${chrom}.${params.out_prefix}.eagle2.log
+          --outPrefix=chr${chrom}.${params.output_prefix}.eagle2 2>&1 | \
+          tee chr${chrom}.${params.output_prefix}.eagle2.log
         """
 }
 
@@ -407,7 +407,7 @@ process shapeitPhaseWithoutRef() {
         publishDir path: "${params.output_dir}", mode: 'copy'
         tuple \
             val(chrom), \
-            path("chr${chrom}.${params.out_prefix}.shapeit4.noref.vcf.gz")
+            path("chr${chrom}.${params.output_prefix}.shapeit4.noref.vcf.gz")
     script:
         """
         shapeit4 \
@@ -416,8 +416,8 @@ process shapeitPhaseWithoutRef() {
           --region ${chrom} \
           --thread ${task.cpus} \
           --pbwt-depth ${params.pbwt} \
-          --log chr${chrom}.${params.out_prefix}.shapeit4.noref.log \
-          --output chr${chrom}.${params.out_prefix}.shapeit4.noref.vcf.gz
+          --log chr${chrom}.${params.output_prefix}.shapeit4.noref.log \
+          --output chr${chrom}.${params.output_prefix}.shapeit4.noref.vcf.gz
         """
 }
 
@@ -438,7 +438,7 @@ process shapeitPhaseWithRef() {
         publishDir path: "${params.output_dir}", mode: 'copy'
         tuple \
             val(chrom), \
-            path("chr${chrom}.${params.out_prefix}.shapeit4.vcf.gz")
+            path("chr${chrom}.${params.output_prefix}.shapeit4.vcf.gz")
     script:
         """
         shapeit4 \
@@ -448,8 +448,8 @@ process shapeitPhaseWithRef() {
           --region ${chrom} \
           --thread ${task.cpus} \
           --pbwt-depth ${params.pbwt} \
-          --log chr${chrom}.${params.out_prefix}.shapeit4.log \
-          --output chr${chrom}.${params.out_prefix}.shapeit4.vcf.gz
+          --log chr${chrom}.${params.output_prefix}.shapeit4.log \
+          --output chr${chrom}.${params.output_prefix}.shapeit4.vcf.gz
         """
 }
 
