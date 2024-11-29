@@ -9,7 +9,7 @@ include {
     getPlinkGeneticMap;
     getEagleHapmapGeneticMap;
     getShapeitGeneticMap;
-    getThousandGenomesReference;
+    getKgpPanel;
     getVcf;
     //getVcfFileset;
     splitVcfByChrom;
@@ -20,9 +20,9 @@ include {
     shapeitPhaseWithoutRef;
     getVcfIndex;
     getVcfIndex as getPhasedVcfIndex;
-    getCostumReferencePanel;
+    getCustomVcfPanel;
     getm3vcf;
-    getMinimacReference;
+    getCustomM3Panel;
     imputeVariantsWithMinimac4;
 } from "${projectDir}/modules/phasing_and_imputation.nf"
 
@@ -47,7 +47,7 @@ workflow {
        if(params.phase_tool == 'eagle2') {
             if(params.with_ref == true) {
                 geneticmap = getEagleHapmapGeneticMap()
-                refpanel = getThousandGenomesReference()
+                refpanel = getKgpPanel()
                 refpanel.combine(geneticmap).set { panel_map }
                 vcfFileset.join(panel_map).set { phase_input }
                 phased = eaglePhaseWithRef(phase_input)
@@ -59,7 +59,7 @@ workflow {
        } else if(params.phase_tool == 'shapeit4') {
             if(params.with_ref == true) {
                 geneticmap = getShapeitGeneticMap()
-                refpanel = getThousandGenomesReference()
+                refpanel = getKgpPanel()
                 refpanel.join(geneticmap).set { panel_map }
                 vcfFileset.join(panel_map).set { phase_input }
                 phased = shapeitPhaseWithRef(phase_input).view()
@@ -84,7 +84,7 @@ workflow {
         if(params.impute_tool == 'minimac4') {
             vcf = getPhasedVcf()
             validateVcf(vcf).map { chr, vcf_file, vcf_index -> tuple(chr.baseName, vcf_file, vcf_index) }.set { vcf_fileset }
-            getMinimacReference().set{ minimac_ref_panel }
+            getCustomM3Panel().set{ minimac_ref_panel }
             vcf_fileset.join(minimac_ref_panel).set{ minimac_input }
             imputeVariantsWithMinimac4(minimac_input)
         }
@@ -101,7 +101,7 @@ workflow {
         if(params.phase_tool == 'eagle2' && params.impute_tool == 'minimac4') {
              if(params.with_ref == true) {
                  getEagleHapmapGeneticMap().set { geneticmap }
-                 getThousandGenomesReference().set { refpanel }
+                 getKgpPanel().set { refpanel }
                  refpanel.combine(geneticmap).set { panel_map }
                  vcfFileset.join(panel_map).set { phase_input }
                  eaglePhaseWithRef(phase_input).set { phased }
@@ -112,14 +112,14 @@ workflow {
              }
 
              getPhasedVcfIndex(phased).set { phased_vcf_fileset }
-             getMinimacReference().set{ minimac_ref_panel }
+             getCustomM3Panel().set{ minimac_ref_panel }
              phased_vcf_fileset.join(minimac_ref_panel).set{ minimac_input }
              imputeVariantsWithMinimac4(minimac_input)
 
         } else if(params.phase_tool == 'shapeit4' && params.impute_tool == 'minimac4') {
              if(params.with_ref == true) {
                  geneticmap = getShapeitGeneticMap()
-                 refpanel = getThousandGenomesReference()
+                 refpanel = getKgpPanel()
                  refpanel.join(geneticmap).set { panel_map }
                  vcfFileset.join(panel_map).set { phase_input }
                  phased = shapeitPhaseWithRef(phase_input).view()
@@ -130,7 +130,7 @@ workflow {
              }
 
              getPhasedVcfIndex(phased).set { phased_vcf_fileset }
-             getMinimacReference().set{ minimac_ref_panel }
+             getCustomM3Panel().set{ minimac_ref_panel }
              phased_vcf_fileset.join(minimac_ref_panel).set{ minimac_input }
              imputeVariantsWithMinimac4(minimac_input)
 
