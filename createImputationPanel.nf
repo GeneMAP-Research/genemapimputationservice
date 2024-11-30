@@ -6,10 +6,8 @@ include {
     getChromosomes;
     getHapmapGeneticMap;
     getPlinkGeneticMap;
-    getThousandGenomesReference;
     getVcf;
     splitVcfByChrom;
-    alignGenotypesToReference;
     beaglephase;
     eaglePhaseWithoutRef;
     getEagleHapmapGeneticMap;

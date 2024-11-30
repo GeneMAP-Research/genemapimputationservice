@@ -36,7 +36,8 @@ workflow {
     if(params.phase == true && params.impute == false) {
        println "\nMODE: PHASE ONLY\n"
    
-       getChromosomes().set { chromosome }
+       getChromosomes()
+           .set { chromosome }
        
        vcf = getVcf()
        chromosome.combine(vcf).set { split_vcf_input }

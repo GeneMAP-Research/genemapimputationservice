@@ -7,7 +7,7 @@ def listChromosomes() {
 }
 
 def getChromosomes() {
-    if(params.autosome == "true") {
+    if(params.autosome == true) {
        channel.of(1..22)
     } else {
        channel.of(1..22, 'X')
