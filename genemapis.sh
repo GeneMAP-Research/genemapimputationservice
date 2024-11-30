@@ -145,7 +145,7 @@ function imputeusage() {
            options:
            --------
            --impute_tool        : (optional) minimac4, impute2, beagle5 [default: minimac4] 
-	   --panel              : (optional) available panels: custom, kgp, h3a [default: kgp]
+	   --panel              : (optional) available panels: custom, kgp, h3a, genemapv1p1 [default: genemapv1p1]
            --vcf                : (required) VCF file. Must specify full path
            --autosome           : (optional) specify this flag to process autosomes only
            --output_prefix      : (optional) output prefix [default: myout]
@@ -275,7 +275,7 @@ params {
 
   /***************************************************************************************
   ~ impute_tool: (optional) minimac4, impute2, beagle5 [default: minimac4]
-  ~ panel: (optional) available imputation panels: custom, kgp, h3a [default: kgp]
+  ~ panel: (optional) available imputation panels: custom, kgp, h3a, genemapv1p1 [default: genemapv1p1]
   ~ vcf: (required) VCF file. Must specify full path
   ~ autosome: (optional) specify this flag to process autosomes only
   ~ output_prefix: (optional) output prefix [default: myout]

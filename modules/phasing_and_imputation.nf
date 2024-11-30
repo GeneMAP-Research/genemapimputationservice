@@ -7,10 +7,30 @@ def listChromosomes() {
 }
 
 def getChromosomes() {
-    if(params.autosome == "true") {
+    if(params.autosome == true) {
        channel.of(1..22)
     } else {
        channel.of(1..22, 'X')
+    }
+}
+
+def getRefPanel() {
+    if(params.impute_tool == 'minimac4' ) {
+        if(params.panel == 'kgp') {
+            getKgpM3Panel()
+        } else if(params.panel == 'h3a') {
+            getH3aM3Panel()
+        } else if(params.panel == 'genemapv1p1') {
+            getGenemapV1P1M3Panel()
+        }
+    } else {
+        if(params.panel == 'kgp') {
+            getKgpPanel()
+        } else if(params.panel == 'h3a') {
+            getH3aPanel()
+        } else if(params.panel == 'genemapv1p1') {
+            getGenemapV1P1Panel()
+        }
     }
 }
 
@@ -34,8 +54,18 @@ def getKgpPanel() {
 	    	  }
 }
 
+/genemapv1p1/
+
 def getCustomM3Panel() {
     return channel.fromFilePairs( params.panel_dir + "/custom/*.{m3vcf.gz,rec,erate}", size: 3 )
+                  .ifEmpty { error: println "\nAn error occurred! Please check that the reference files exist...\n" }
+                  .map { chr, ref_fileset ->
+                         tuple( chr.replaceFirst(/chr/,""), ref_fileset[0], ref_fileset[1], ref_fileset[2])
+                  }
+}
+
+def getGenemapV1P1Panel() {
+    return channel.fromFilePairs( params.panel_dir + "/genemapv1p1/chr*.genemapv1p1.vcf.{gz,gz.tbi}", size: 2 )
                   .ifEmpty { error: println "\nAn error occurred! Please check that the reference files exist...\n" }
                   .map { chr, ref_fileset ->
                          tuple( chr.replaceFirst(/chr/,""), ref_fileset[0], ref_fileset[1], ref_fileset[2])

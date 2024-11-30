@@ -9,6 +9,7 @@ include {
     getPlinkGeneticMap;
     getEagleHapmapGeneticMap;
     getShapeitGeneticMap;
+    getRefPanel;
     getKgpPanel;
     getVcf;
     //getVcfFileset;
@@ -87,6 +88,8 @@ workflow {
             getCustomM3Panel().set{ minimac_ref_panel }
             vcf_fileset.join(minimac_ref_panel).set{ minimac_input }
             imputeVariantsWithMinimac4(minimac_input)
+        } else {
+            getRefPanel().view()
         }
     } else if(params.phase == true && params.impute == true) {
         println "\nMODE: PHASE AND IMPUTE\n"
