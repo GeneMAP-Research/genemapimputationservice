@@ -1,5 +1,5 @@
 def getPhasedVcf() {
-    return channel.fromPath(params.input_dir + "*.vcf.gz")
+    return channel.fromPath(params.vcf_dir + "*.vcf.gz")
 }
 
 def getValidationExitStatus(exit_code) {
@@ -50,7 +50,7 @@ process getm3vcf() {
             path(input_vcf), \
             path(vcf_index) 
     output:
-        publishDir path: "${params.panel_dir}/m3vcfs/", mode: 'copy'
+        publishDir path: "${params.output_dir}/m3vcfs/", mode: 'copy'
         tuple \
             val(chrom), \
             path("chr${chrom}*")
@@ -76,7 +76,7 @@ process createLegendFile() {
             path(input_vcf), \
             path(vcf_index)
     output:
-        publishDir path: "${params.out_dir}", mode: 'copy'
+        publishDir path: "${params.output_dir}", mode: 'copy'
         tuple \
             val(chrom), \
             path(input_vcf), \
@@ -107,7 +107,7 @@ process prepareChrXPanel() {
             val(chrom), \
             path(input_vcf)
     output:
-        publishDir path: "${params.out_dir}", mode: 'copy'
+        publishDir path: "${params.output_dir}", mode: 'copy'
         tuple \
             val(chrom), \
             path("${input_vcf.simpleName}_PAR1.vcf.gz"), \
